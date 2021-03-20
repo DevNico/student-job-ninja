@@ -2,11 +2,12 @@ FROM node:alpine3.13
 
 WORKDIR /app
 
-ADD package.json /app/package.json
+ADD package.json .
 RUN npm config set registry http://registry.npmjs.org
+RUN npm i -g @nestjs/cli
 RUN npm install
 
-ADD . /app
+ADD . .
 
 EXPOSE 3000
 
