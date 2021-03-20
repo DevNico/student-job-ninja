@@ -1,0 +1,54 @@
+# This is a basic workflow to help you get started with Actions
+
+name: deployment-workflow
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  job_one:
+    name: Deploy
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    steps:
+      # Runs a single command using the runners shell
+      - name: remove current running project container
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: vps2080920.fastwebserver.de
+          username: thss21
+          key: ${{ secrets.JS_SSH_KEY }}
+          port: 22
+          script: |
+            cd project_js/api/docker
+            docker-compose down --rmi all
+      - name: get latest project changes
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: vps2080920.fastwebserver.de
+          username: thss21
+          key: ${{ secrets.JS_SSH_KEY }}
+          port: 22
+          script: |
+            cd project_js/api/ss21-js-backend
+            rm -rf dist
+            git pull
+      - name: Build new container and start
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: vps2080920.fastwebserver.de
+          username: thss21
+          key: ${{ secrets.JS_SSH_KEY }}
+          port: 22
+          script: |
+            cd project_js/api/docker
+            docker-compose up -d --build
+            
