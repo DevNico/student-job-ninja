@@ -41,7 +41,7 @@ export class CompaniesService {
   }
   //Equal to getStudentById -> login response codes should be the same for frontend error handling
   //TODO: shared directory
-  async getCompanyById(id: string): Promise<Company | any> {
+  async getCompanyById(id: string): Promise<Company> {
     //find one company based on id in database an return result
     //404 if no company found
     //500 if database error occured

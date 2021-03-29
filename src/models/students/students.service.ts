@@ -43,7 +43,7 @@ export class StudentsService {
   }
 
   //TODO: shared directory
-  async getStudentById(id: string): Promise<Student | any> {
+  async getStudentById(id: string): Promise<Student> {
     //find one student based on id in database an return result
     //404 if no entry found
     //500 if database error occured
