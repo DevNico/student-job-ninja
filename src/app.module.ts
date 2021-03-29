@@ -4,6 +4,8 @@ import { StudentsModule } from 'src/models/students/students.module';
 import { MongoModule } from 'src/providers/mongodb/mongo.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CompaniesService } from './models/companies/companies.service';
+import { StudentsService } from './models/students/students.service';
 
 @Module({
   imports: [
@@ -14,6 +16,6 @@ import { AppService } from './app.service';
     StudentsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, StudentsService, CompaniesService],
 })
 export class AppModule {}
