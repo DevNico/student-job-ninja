@@ -2,6 +2,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import { Db } from 'mongodb';
@@ -23,7 +24,7 @@ export class StudentsService {
     //create the entity object and assign additional properties from firebase auth token
     const studentEntity = new Student(student);
     Object.assign(studentEntity, {
-      user_id: _firebaseUser.user_id,
+      _id: _firebaseUser.user_id,
       email: _firebaseUser.email,
       entities: _firebaseUser.firebase.entities,
     });
@@ -37,26 +38,9 @@ export class StudentsService {
       })
       .catch((err) => {
         console.error(err);
+        if (err.code === 11000) throw new NotAcceptableException();
         throw new InternalServerErrorException();
       });
     return result;
-  }
-
-  //TODO: shared directory
-  async getStudentById(id: string): Promise<Student> {
-    //find one student based on id in database an return result
-    //404 if no entry found
-    //500 if database error occured
-    return this.mongodb
-      .collection('students')
-      .findOne({ user_id: id })
-      .then((result) => {
-        if (!result) throw new NotFoundException();
-        return result;
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new InternalServerErrorException();
-      });
   }
 }

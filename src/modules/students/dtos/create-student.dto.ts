@@ -9,9 +9,9 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-import { Address } from 'src/common/interfaces/address.interface';
-import { JobHistory } from '../interfaces/job-history.interface';
-import { University } from '../interfaces/university.interface';
+import { Address } from 'src/common/models/address.model';
+import { JobHistory } from '../models/job-history.model';
+import { University } from '../models/university.model';
 
 //validation for Json body of '/students/signup'
 //assigned to student object (persisted)

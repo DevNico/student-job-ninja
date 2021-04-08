@@ -6,7 +6,7 @@ import {
   IsString,
   Length,
 } from 'class-validator';
-import { Address } from 'src/common/interfaces/address.interface';
+import { Address } from 'src/common/models/address.model';
 
 export class CreateCompanyDto {
   @IsOptional()

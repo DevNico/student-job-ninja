@@ -1,6 +1,6 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
-import { Company } from 'src/models/companies/entities/company.entity';
-import { Student } from 'src/models/students/entities/student.entity';
+import { Company } from 'src/modules/companies/entities/company.entity';
+import { Student } from 'src/modules/students/entities/student.entity';
 
 export class SignInResponse {
   @ApiProperty({

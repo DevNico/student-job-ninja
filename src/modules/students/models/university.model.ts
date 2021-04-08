@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Address } from 'src/common/interfaces/address.interface';
+import { Address } from 'src/common/models/address.model';
 
 export class University {
   @ApiProperty()
