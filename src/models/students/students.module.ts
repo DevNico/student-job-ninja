@@ -5,8 +5,8 @@ import { MongoModule } from 'src/providers/mongodb/mongo.module';
 import { FirebaseStrategy } from 'src/common/auth/firebase-auth.strategy';
 
 @Module({
-  imports: [MongoModule],
-  providers: [StudentsService, FirebaseStrategy],
+  imports: [MongoModule, FirebaseStrategy],
+  providers: [StudentsService],
   controllers: [StudentsController],
 })
 export class StudentsModule {}

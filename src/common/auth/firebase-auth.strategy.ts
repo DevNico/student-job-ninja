@@ -13,7 +13,7 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, 'firebase') {
     });
   }
 
-  //call verify every time an endpoint is marked mit @useGuard(AuthGuard)
+  //call verify every time an endpoint is marked with @useGuard(AuthGuard)
   async validate(req: Request): Promise<admin.auth.DecodedIdToken> {
     let token: string = req.headers['authorization'];
     if (!token) throw new UnauthorizedException();

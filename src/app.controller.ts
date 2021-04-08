@@ -6,6 +6,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { FirebaseAuthGuard } from './common/auth/firebase-auth.guard';
 import { SignInResponse } from './common/interfaces/sign-in-response.interface';
@@ -21,8 +22,14 @@ export class AppController {
   ) {}
 
   //global signin for students and companies
+  @ApiTags('auth')
+  @ApiOkResponse({
+    status: 200,
+    description: 'The student has been successfully created.',
+    type: SignInResponse,
+  })
   @UseGuards(FirebaseAuthGuard)
-  @Get('signin')
+  @Get('user/me')
   async signin(@Req() req): Promise<SignInResponse> {
     //search for user in students collection
     return this.studentsService

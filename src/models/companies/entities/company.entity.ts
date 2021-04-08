@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Address } from 'src/common/interfaces/address.interface';
 
 export class Company {
@@ -7,6 +8,10 @@ export class Company {
   company_info: string;
   homepage: string;
   image_url: string;
+  @ApiProperty({
+    description: 'address field',
+    type: Address,
+  })
   address: Address;
 
   constructor(partial: Partial<Company>) {

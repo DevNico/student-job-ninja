@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
   IsInt,
@@ -9,8 +10,8 @@ import {
   MinLength,
 } from 'class-validator';
 import { Address } from 'src/common/interfaces/address.interface';
-import { IjobHistory } from '../interfaces/job-history.interface';
-import { Iuniversity } from '../interfaces/university.interface';
+import { JobHistory } from '../interfaces/job-history.interface';
+import { University } from '../interfaces/university.interface';
 
 //validation for Json body of '/students/signup'
 //assigned to student object (persisted)
@@ -23,13 +24,22 @@ export class CreateStudentDto {
   @MinLength(2)
   lastName: string;
 
+  @ApiProperty({
+    description: 'address field',
+    type: Address,
+  })
   @IsNotEmpty()
   @IsObject()
   address: Address;
 
+  @ApiProperty({
+    description: 'university object',
+    type: University,
+    required: true,
+  })
   @IsNotEmpty()
   @IsObject()
-  university: Iuniversity;
+  university: University;
 
   @IsNotEmpty()
   @IsInt()
@@ -37,15 +47,19 @@ export class CreateStudentDto {
   @Max(20)
   semester: number;
 
+  @ApiProperty({
+    description: 'address field',
+    type: [JobHistory],
+  })
   @IsOptional()
-  job_history: IjobHistory[];
+  job_history: JobHistory[];
 
   @IsNotEmpty()
   @IsArray()
   skills: string[];
 
   @IsArray()
-  datesAvailable: Date[];
+  datesAvailable: string[];
 
   @IsInt() //full-time: 1 //half-time: 2
   @Min(1)

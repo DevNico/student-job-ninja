@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsObject,
@@ -19,6 +20,10 @@ export class CreateCompanyDto {
   @IsOptional()
   image_url: string;
 
+  @ApiProperty({
+    description: 'address field',
+    type: Address,
+  })
   @IsNotEmpty()
   @IsObject()
   address: Address;
