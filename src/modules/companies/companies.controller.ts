@@ -19,6 +19,7 @@ export class CompaniesController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard)
   @Post('signup')
   signup(@Req() req, @Body() companyData: CreateCompanyDto): any {

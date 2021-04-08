@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Db } from 'mongodb';
-import { Student } from './modules/students/entities/student.entity';
 
 @Injectable()
 export class SharedDataAccessService {
@@ -15,13 +14,9 @@ export class SharedDataAccessService {
   ) {}
 
   //Get student or Company Profile by its ID
-  async getUserById<T>(id: string): Promise<T> {
-    let collection = 'companies';
-    let v: T;
+  async getUserById<T>(id: string, collection: string): Promise<T> {
     //404 if no entry found
     //500 if database error occured
-    if (typeof v === typeof Student) collection = 'students';
-
     return this.mongodb
       .collection(collection)
       .findOne({ _id: id })

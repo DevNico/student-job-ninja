@@ -3,7 +3,6 @@ import {
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
-  NotFoundException,
 } from '@nestjs/common';
 import { Db } from 'mongodb';
 import { CreateStudentDto } from './dtos/create-student.dto';
@@ -37,7 +36,6 @@ export class StudentsService {
         return result;
       })
       .catch((err) => {
-        console.error(err);
         if (err.code === 11000) throw new NotAcceptableException();
         throw new InternalServerErrorException();
       });

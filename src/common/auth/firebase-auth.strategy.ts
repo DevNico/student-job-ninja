@@ -2,7 +2,6 @@ import { Strategy } from 'passport-custom';
 import { PassportStrategy } from '@nestjs/passport';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import * as serviceAccount from '../../../firebase-admin-credentials.json';
 @Injectable()
 export class FirebaseStrategy extends PassportStrategy(Strategy, 'firebase') {
   constructor(
@@ -10,12 +9,6 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, 'firebase') {
     private admin: any,
   ) {
     super();
-    /*
-    //initialise app with custom credentials from service json file
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-    });
-    */
   }
 
   //call verify every time an endpoint is marked with @useGuard(AuthGuard)
