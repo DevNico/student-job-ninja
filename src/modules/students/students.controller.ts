@@ -1,5 +1,19 @@
-import { Body, Controller, Delete, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FirebaseAuthGuard } from 'src/common/auth/firebase-auth.guard';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { StudentDto } from './dtos/create-student.dto';
@@ -54,7 +68,7 @@ export class StudentsController {
     return result;
   }
 
-  @ApiTags('companies')
+  @ApiTags('students')
   @ApiOperation({ summary: 'delete own profile' })
   @ApiBearerAuth()
   @ApiOkResponse({

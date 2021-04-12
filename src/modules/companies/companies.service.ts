@@ -1,14 +1,19 @@
+import { IsNotEmpty } from 'class-validator';
 import {
   Inject,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
+  NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
-import { Db } from 'mongodb';
+import { Db, ObjectId } from 'mongodb';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { MailService } from '../mail/mail.service';
 import { CompanyDto } from './dtos/company.dto';
+import { CreateJobDto } from './dtos/create-job.dto';
 import { Company } from './entities/company.entity';
+import { Job } from './entities/job.entity';
 
 @Injectable()
 export class CompaniesService {
@@ -60,5 +65,45 @@ export class CompaniesService {
       });
     if (profileDeleteResult) return profileDeleteResult.deletedCount;
     throw new InternalServerErrorException();
+  }
+
+  async createJob(_firebaseUser: any, jobData: CreateJobDto): Promise<Job> {
+    const job: Job = new Job();
+    const id: ObjectId = new ObjectId();
+    Object.assign(job, jobData, {
+      _id: id,
+      publisher_id: _firebaseUser.user_id,
+      contact_mail: _firebaseUser.email,
+    });
+    return this.mongodb
+      .collection('jobs')
+      .insertOne(job)
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException();
+      })
+      .then((result) => {
+        if (result.insertedCount > 0) {
+          return job;
+        }
+        throw new UnprocessableEntityException();
+      });
+  }
+
+  async getJobs(userId: string): Promise<Job[]> {
+    return this.mongodb
+      .collection('jobs')
+      .find({ publisher_id: userId })
+      .toArray()
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException();
+      })
+      .then((result) => {
+        if (result.length > 0) {
+          return result;
+        }
+        throw new NotFoundException();
+      });
   }
 }

@@ -7,6 +7,7 @@ import {
   Req,
   UseGuards,
   Put,
+  Get,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -19,6 +20,8 @@ import { FirebaseAuthGuard } from 'src/common/auth/firebase-auth.guard';
 import { CompaniesService } from './companies.service';
 import { CompanyDto } from './dtos/company.dto';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
+import { CreateJobDto } from './dtos/create-job.dto';
+import { Job } from './entities/job.entity';
 
 @Controller('companies')
 export class CompaniesController {
@@ -78,6 +81,43 @@ export class CompaniesController {
       Company,
       CompanyDto
     >(req.user.user_id, 'companies', updateData);
+    return result;
+  }
+
+  @ApiTags('companies')
+  @ApiOperation({ summary: 'create job' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'Job created successfully.',
+    type: Job,
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiResponse({ status: 422, description: 'Unprocessable entity' })
+  @ApiBearerAuth('access-token')
+  @Post('job')
+  @UseGuards(FirebaseAuthGuard)
+  createJob(@Req() req, @Body() updateData: CreateJobDto): Promise<Job> {
+    const result = this.companiesService.createJob(req.user, updateData);
+    return result;
+  }
+
+  @ApiTags('companies')
+  @ApiOperation({ summary: 'get published jobs' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'list of own published jobs.',
+    type: Job,
+    isArray: true,
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 404, description: 'No Jobs found' })
+  @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiBearerAuth('access-token')
+  @Get('job')
+  @UseGuards(FirebaseAuthGuard)
+  getJobs(@Req() req): Promise<Job[]> {
+    const result = this.companiesService.getJobs(req.user.user_id);
     return result;
   }
 }
