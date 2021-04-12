@@ -15,7 +15,7 @@ import { University } from '../models/university.model';
 
 //validation for Json body of '/students/signup'
 //assigned to student object (persisted)
-export class CreateStudentDto {
+export class StudentDto {
   @IsNotEmpty()
   @MinLength(2)
   firstName: string;

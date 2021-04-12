@@ -17,7 +17,7 @@ import { MongoClient, Db } from 'mongodb';
             useUnifiedTopology: true,
           });
           //select a database with the given name ( if not already existing, creates a new one)
-          const db = client.db('projectstore');
+          const db: Db = client.db('projectstore');
 
           await db
             .collection('init_collection')

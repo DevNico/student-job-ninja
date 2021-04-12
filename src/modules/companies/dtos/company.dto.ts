@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Address } from 'src/common/models/address.model';
 
-export class CreateCompanyDto {
+export class CompanyDto {
   @IsOptional()
   contact_mail: string;
   @IsString()
