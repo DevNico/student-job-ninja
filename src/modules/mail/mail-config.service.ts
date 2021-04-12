@@ -8,6 +8,7 @@ export class MailConfigService implements MailerOptionsFactory {
   //email configuration file with connection parameters from .env
   createMailerOptions(): MailerOptions {
     return {
+      //Mail provider connection options
       transport: {
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,
@@ -22,6 +23,8 @@ export class MailConfigService implements MailerOptionsFactory {
       defaults: {
         from: `"${process.env.MAIL_DEFAULT_NAME}" <${process.env.MAIL_DEFAULT_FROM}>`,
       },
+      //load templates by path and set a handlebars adaperter
+      // (used for replace text and url in email template)
       template: {
         dir: path.join(
           process.cwd(),

@@ -6,19 +6,20 @@ import { MailData } from './interfaces/mail-data.interface';
 export class MailService {
   private mailerService: MailerService;
 
-  async sendJobOffer(mailData: MailData<{ hash: string }>) {
+  //send a job offer to student and replace template text with handlebars (context)
+  async sendJobOffer(mailData: MailData) {
     await this.mailerService.sendMail({
       to: mailData.to,
       subject: 'subject',
       text: `text`,
       template: 'example',
       context: {
-        title: 'title',
-        url: `accept url`,
-        actionTitle: 'url title',
-        app_name: 'appname',
-        text1: 'text 1',
-        text2: 'text 2',
+        title: mailData.title,
+        url: mailData.url,
+        actionTitle: 'Anfrage akzeptieren',
+        app_name: 'Studentenjobbörse',
+        text1: mailData.text1,
+        text2: mailData.text2,
       },
     });
   }

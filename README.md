@@ -95,3 +95,41 @@ $ npm install
 2. In case Token is available the validate Method of FirebaseAuthStrategy extracts it and tries to validate and decode token by using the firebase admin
 
 3. After validation the token payload will be chained to the Request object and is reachable with the user key ``req.user``
+
+## Mail Module
+- Technologies: 
+  - @nest-modules/mailer for connecting to provider and send mails
+  - Handlebars as template engine for replacing text and url in email
+
+### Configuration
+- Class with configuation: ``mail-config.service.ts`` (mailConfigService)
+- Initialise mailer in root ``app.module.ts``
+  ```typescript
+  MailerModule.forRootAsync({
+      useClass: MailConfigService,
+  }),
+  ```
+- Use MailModule in Students/companies service
+  ```typescript
+  //Import Module in student/company module
+  @Module({
+  imports: [MailModule],
+  })
+
+  //inject in service class via constructor
+  constructor(
+    private mailService: MailService,
+  ) {}
+  ```
+### Usage example
+```typescript
+await this.mailService.sendJobOffer({
+        to: email,
+        title: 'mail title',
+        url: 'accept offer url',
+        text1: 'template text1',
+        text2: 'template text2'
+    });
+```
+
+
