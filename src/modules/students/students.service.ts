@@ -5,6 +5,7 @@ import {
   NotAcceptableException,
 } from '@nestjs/common';
 import { Db } from 'mongodb';
+import { MailService } from '../mail/mail.service';
 import { CreateStudentDto } from './dtos/create-student.dto';
 import { Student } from './entities/student.entity';
 
@@ -14,6 +15,7 @@ export class StudentsService {
   constructor(
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
+    private mailService: MailService,
   ) {}
 
   async createStudent(
