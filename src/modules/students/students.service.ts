@@ -1,9 +1,11 @@
 import {
+  CACHE_MANAGER,
   Inject,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
 } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { Db } from 'mongodb';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { MailService } from '../mail/mail.service';
@@ -16,6 +18,8 @@ export class StudentsService {
   constructor(
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache, //TODO: testing
     private mailService: MailService,
     private sharedDataAccessService: SharedDataAccessService,
   ) {}

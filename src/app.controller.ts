@@ -1,4 +1,5 @@
 import {
+  CacheTTL,
   Controller,
   Get,
   InternalServerErrorException,
@@ -28,6 +29,7 @@ export class AppController {
   })
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard)
+  @CacheTTL(20) //TODO: TESTING
   @Get('user/me')
   async signin(@Req() req): Promise<SignInResponse> {
     //search for user in students collection
