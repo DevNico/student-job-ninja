@@ -3,8 +3,6 @@ import {
   IsArray,
   IsEmail,
   IsNotEmpty,
-  IsObject,
-  IsOptional,
   IsString,
   Length,
 } from 'class-validator';
@@ -27,6 +25,10 @@ export class CreateJobDto {
   @IsNotEmpty()
   @IsArray()
   skills: string[];
+
+  @IsNotEmpty()
+  @IsArray()
+  languages: string[];
 
   //TODO: convert to date?
   @IsNotEmpty()

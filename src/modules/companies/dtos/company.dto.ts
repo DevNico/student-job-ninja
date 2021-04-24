@@ -9,8 +9,8 @@ import {
 import { Address } from 'src/common/models/address.model';
 
 export class CompanyDto {
-  @IsOptional()
-  contact_mail: string;
+  @IsNotEmpty()
+  email: string;
   @IsString()
   @Length(1, 500)
   company_info: string;

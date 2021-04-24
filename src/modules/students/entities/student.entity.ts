@@ -1,9 +1,10 @@
 import { Address } from 'src/common/models/address.model';
+import { Entity } from 'src/providers/mongodb/entity.model';
 import { JobHistory } from '../models/job-history.model';
 import { University } from '../models/university.model';
 
 //entity frame Object
-export class Student {
+export class Student extends Entity {
   //equal to firebase -> user_id
   _id: string;
   //equal to firebase -> email
@@ -20,7 +21,8 @@ export class Student {
   datesAvailable: string[];
   workBasis: number;
 
-  constructor(partial: Partial<Student>) {
+  constructor(id, partial: Partial<Student>) {
+    super(id);
     Object.assign(this, partial);
   }
 }

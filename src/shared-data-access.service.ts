@@ -2,10 +2,12 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotAcceptableException,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Db, DeleteWriteOpResultObject } from 'mongodb';
+import { Role } from './common/enums/roles.enum';
 
 @Injectable()
 export class SharedDataAccessService {
@@ -13,6 +15,29 @@ export class SharedDataAccessService {
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
   ) {}
+
+  async addUserToAuthStore(
+    id: string,
+    email: string,
+    role: Role,
+  ): Promise<boolean> {
+    return this.mongodb
+      .collection('registry')
+      .insertOne({
+        _id: id,
+        email,
+        role,
+      })
+      .then((result) => {
+        if (result && result.insertedCount > 0) {
+          return true;
+        }
+      })
+      .catch((err) => {
+        if (err.code === 11000) throw new NotAcceptableException();
+        throw new InternalServerErrorException();
+      });
+  }
 
   //Get student or Company Profile by its ID
   async getUserById<T>(id: string, collection: string): Promise<T> {
@@ -23,7 +48,7 @@ export class SharedDataAccessService {
       .findOne({ _id: id })
       .then((result) => {
         if (!result) throw new NotFoundException();
-        return <T>result;
+        return result as T;
       })
       .catch((err) => {
         console.error(err);
@@ -49,7 +74,7 @@ export class SharedDataAccessService {
       })
       .then((result) => {
         if (result) {
-          return <T>result;
+          return result as T;
         }
         throw new UnprocessableEntityException();
       });

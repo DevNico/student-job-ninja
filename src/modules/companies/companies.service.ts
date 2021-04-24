@@ -1,4 +1,3 @@
-import { IsNotEmpty } from 'class-validator';
 import {
   Inject,
   Injectable,
@@ -14,6 +13,7 @@ import { CompanyDto } from './dtos/company.dto';
 import { CreateJobDto } from './dtos/create-job.dto';
 import { Company } from './entities/company.entity';
 import { Job } from './entities/job.entity';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class CompaniesService {
@@ -29,18 +29,14 @@ export class CompaniesService {
     _firebaseUser: any,
   ): Promise<Company | any> {
     //build entity object (assign id and email from properties from firebase
-    const companyEntity = new Company(company);
-    Object.assign(companyEntity, {
-      _id: _firebaseUser.user_id,
-      email: _firebaseUser.email,
-    });
+    const companyEntity = new Company(_firebaseUser.user_id, company);
 
     //store entity in mongodb
     return this.mongodb
       .collection('companies')
       .insertOne(companyEntity)
       .then((result) => {
-        if (result && result.result.ok > 0) {
+        if (result && result.insertedCount > 0) {
           return companyEntity;
         }
       })
@@ -52,14 +48,14 @@ export class CompaniesService {
   }
 
   async delete(_firebaseUser: any): Promise<number> {
-    const id = _firebaseUser.user_id;
+    const _id = _firebaseUser.user_id;
     //TODO: check for unfinished but requested jobs -> reject
 
     //TODO: delete all job offers
 
     //delete profile by id
     const profileDeleteResult = await this.sharedDataAccessService
-      .deleteProfile(id, 'companies')
+      .deleteProfile(_id, 'companies')
       .catch((err) => {
         throw err;
       });
@@ -68,12 +64,10 @@ export class CompaniesService {
   }
 
   async createJob(_firebaseUser: any, jobData: CreateJobDto): Promise<Job> {
-    const job: Job = new Job();
-    const id: ObjectId = new ObjectId();
-    Object.assign(job, jobData, {
-      _id: id,
+    const id: string = uuid();
+    const job = new Job(id, jobData);
+    Object.assign(job, {
       publisher_id: _firebaseUser.user_id,
-      contact_mail: _firebaseUser.email,
     });
     return this.mongodb
       .collection('jobs')

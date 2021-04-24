@@ -29,10 +29,8 @@ export class StudentsService {
     _firebaseUser: any,
   ): Promise<Student> {
     //create the entity object and assign additional properties from firebase auth token
-    const studentEntity = new Student(student);
+    const studentEntity = new Student(_firebaseUser.user_id, student);
     Object.assign(studentEntity, {
-      _id: _firebaseUser.user_id,
-      email: _firebaseUser.email,
       entities: _firebaseUser.firebase.entities,
     });
 

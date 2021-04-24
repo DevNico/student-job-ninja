@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
+  IsEmail,
   IsInt,
   IsNotEmpty,
   IsObject,
@@ -16,6 +17,10 @@ import { University } from '../models/university.model';
 //validation for Json body of '/students/signup'
 //assigned to student object (persisted)
 export class StudentDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
   @IsNotEmpty()
   @MinLength(2)
   firstName: string;

@@ -8,6 +8,7 @@ import {
   UseGuards,
   Put,
   Get,
+  SerializeOptions,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -116,6 +117,9 @@ export class CompaniesController {
   @ApiBearerAuth('access-token')
   @Get('job')
   @UseGuards(FirebaseAuthGuard)
+  @SerializeOptions({
+    excludePrefixes: ['_'],
+  })
   getJobs(@Req() req): Promise<Job[]> {
     const result = this.companiesService.getJobs(req.user.user_id);
     return result;
