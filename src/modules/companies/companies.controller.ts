@@ -9,6 +9,7 @@ import {
   Put,
   Get,
   SerializeOptions,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,6 +24,9 @@ import { CompanyDto } from './dtos/company.dto';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { CreateJobDto } from './dtos/create-job.dto';
 import { Job } from './entities/job.entity';
+import { Collections } from 'src/common/enums/colletions.enum';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/enums/roles.enum';
 
 @Controller('companies')
 export class CompaniesController {
@@ -45,6 +49,12 @@ export class CompaniesController {
   @UseGuards(FirebaseAuthGuard)
   @Post('signup')
   signup(@Req() req, @Body() companyData: CompanyDto): any {
+    const registryCreated = this.sharedDataAccessService.addUserToAuthStore({
+      _id: req.user.user_id,
+      email: req.body.email,
+      roles: [Role.Company],
+    });
+    if (!registryCreated) throw new UnprocessableEntityException();
     const result = this.companiesService.createCompany(companyData, req.user);
     return result;
   }
@@ -81,7 +91,7 @@ export class CompaniesController {
     const result = this.sharedDataAccessService.updateProfile<
       Company,
       CompanyDto
-    >(req.user.user_id, 'companies', updateData);
+    >(req.user.user_id, Collections.Companies, updateData);
     return result;
   }
 

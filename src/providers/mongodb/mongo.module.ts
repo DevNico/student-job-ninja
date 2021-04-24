@@ -1,8 +1,9 @@
-import { Logger } from '@nestjs/common';
+import { Global, Logger } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 import { MongoClient, Db } from 'mongodb';
 ///Module for async initialisation of the mongodb connection
 ///Can be injected by the provider name
+@Global()
 @Module({
   providers: [
     {

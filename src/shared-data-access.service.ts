@@ -7,7 +7,10 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Db, DeleteWriteOpResultObject } from 'mongodb';
+import { Registry } from './common/entities/registry.entity';
+import { Collections } from './common/enums/colletions.enum';
 import { Role } from './common/enums/roles.enum';
+import { Entity } from './providers/mongodb/entity.model';
 
 @Injectable()
 export class SharedDataAccessService {
@@ -16,18 +19,10 @@ export class SharedDataAccessService {
     private mongodb: Db,
   ) {}
 
-  async addUserToAuthStore(
-    id: string,
-    email: string,
-    role: Role,
-  ): Promise<boolean> {
+  async addUserToAuthStore(registryEntry: Registry): Promise<boolean> {
     return this.mongodb
-      .collection('registry')
-      .insertOne({
-        _id: id,
-        email,
-        role,
-      })
+      .collection(Collections.Registry)
+      .insertOne(registryEntry)
       .then((result) => {
         if (result && result.insertedCount > 0) {
           return true;
@@ -40,7 +35,10 @@ export class SharedDataAccessService {
   }
 
   //Get student or Company Profile by its ID
-  async getUserById<T>(id: string, collection: string): Promise<T> {
+  async getUserById<T extends Entity>(
+    id: string,
+    collection: Collections,
+  ): Promise<T> {
     //404 if no entry found
     //500 if database error occured
     return this.mongodb
@@ -56,9 +54,9 @@ export class SharedDataAccessService {
       });
   }
 
-  async updateProfile<T, U>(
+  async updateProfile<T extends Entity, U>(
     userId: string,
-    collection: string,
+    collection: Collections,
     updateData: U,
   ): Promise<T> {
     return this.mongodb
@@ -82,7 +80,7 @@ export class SharedDataAccessService {
 
   async deleteProfile(
     userId: string,
-    collection: string,
+    collection: Collections,
   ): Promise<DeleteWriteOpResultObject> {
     const profileDeleteResult = await this.mongodb
       .collection(collection)

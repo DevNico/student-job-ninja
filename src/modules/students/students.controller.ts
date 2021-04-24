@@ -5,6 +5,7 @@ import {
   Post,
   Put,
   Req,
+  UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -15,6 +16,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FirebaseAuthGuard } from 'src/common/auth/firebase-auth.guard';
+import { Collections } from 'src/common/enums/colletions.enum';
+import { Role } from 'src/common/enums/roles.enum';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { StudentDto } from './dtos/create-student.dto';
 import { Student } from './entities/student.entity';
@@ -44,6 +47,12 @@ export class StudentsController {
   @UseGuards(FirebaseAuthGuard)
   @Post('signup')
   signup(@Req() req, @Body() studentData: StudentDto): any {
+    const registryCreated = this.sharedDataAccessService.addUserToAuthStore({
+      _id: req.user.user_id,
+      email: req.body.email,
+      roles: [Role.Student],
+    });
+    if (!registryCreated) throw new UnprocessableEntityException();
     const result = this.studentsService.createStudent(studentData, req.user);
     return result;
   }
@@ -64,7 +73,7 @@ export class StudentsController {
     const result = this.sharedDataAccessService.updateProfile<
       Student,
       StudentDto
-    >(req.user.user_id, 'companies', updateData);
+    >(req.user.user_id, Collections.Students, updateData);
     return result;
   }
 

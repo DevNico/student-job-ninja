@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FirebaseAuthGuard } from './common/auth/firebase-auth.guard';
+import { Collections } from './common/enums/colletions.enum';
 import { SignInResponse } from './common/models/sign-in-response.model';
 import { Company } from './modules/companies/entities/company.entity';
 import { Student } from './modules/students/entities/student.entity';
@@ -34,12 +35,12 @@ export class AppController {
   async signin(@Req() req): Promise<SignInResponse> {
     //search for user in students collection
     return this.sharedDataAccessService
-      .getUserById<Student>(req.user.user_id, 'students')
+      .getUserById<Student>(req.user.user_id, Collections.Students)
       .catch((err) => {
         //if student not found (err.code == 404) search for user in companies collection
         if (err.code != 404) throw new InternalServerErrorException();
         return this.sharedDataAccessService
-          .getUserById<Company>(req.user.user_id, 'companies')
+          .getUserById<Company>(req.user.user_id, Collections.Companies)
           .catch((err) => {
             //on error use funcion handled errors and return as response
             return err;

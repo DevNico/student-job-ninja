@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Db } from 'mongodb';
+import { Collections } from 'src/common/enums/colletions.enum';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { MailService } from '../mail/mail.service';
 import { StudentDto } from './dtos/create-student.dto';
@@ -57,7 +58,7 @@ export class StudentsService {
 
     //delete profile by id
     const profileDeleteResult = await this.sharedDataAccessService
-      .deleteProfile(id, 'students')
+      .deleteProfile(id, Collections.Students)
       .catch((err) => {
         throw err;
       });

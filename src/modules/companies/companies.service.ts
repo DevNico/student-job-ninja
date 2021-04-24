@@ -6,7 +6,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { Db, ObjectId } from 'mongodb';
+import { Db } from 'mongodb';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { MailService } from '../mail/mail.service';
 import { CompanyDto } from './dtos/company.dto';
@@ -14,6 +14,7 @@ import { CreateJobDto } from './dtos/create-job.dto';
 import { Company } from './entities/company.entity';
 import { Job } from './entities/job.entity';
 import { v4 as uuid } from 'uuid';
+import { Collections } from 'src/common/enums/colletions.enum';
 
 @Injectable()
 export class CompaniesService {
@@ -55,7 +56,7 @@ export class CompaniesService {
 
     //delete profile by id
     const profileDeleteResult = await this.sharedDataAccessService
-      .deleteProfile(_id, 'companies')
+      .deleteProfile(_id, Collections.Companies)
       .catch((err) => {
         throw err;
       });
