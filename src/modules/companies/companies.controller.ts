@@ -9,7 +9,6 @@ import {
   Put,
   Get,
   SerializeOptions,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -27,6 +26,7 @@ import { Job } from './entities/job.entity';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/roles.enum';
+import { RolesGuard } from 'src/common/auth/roles.guard';
 
 @Controller('companies')
 export class CompaniesController {
@@ -48,13 +48,16 @@ export class CompaniesController {
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard)
   @Post('signup')
-  signup(@Req() req, @Body() companyData: CompanyDto): any {
-    const registryCreated = this.sharedDataAccessService.addUserToAuthStore({
+  async signup(
+    @Req() req: Express.Request,
+    @Body() companyData: CompanyDto,
+  ): Promise<Company> {
+    await this.sharedDataAccessService.addUserToAuthStore({
       _id: req.user.user_id,
-      email: req.body.email,
+      email: companyData.email,
       roles: [Role.Company],
     });
-    if (!registryCreated) throw new UnprocessableEntityException();
+    console.log('log center');
     const result = this.companiesService.createCompany(companyData, req.user);
     return result;
   }
@@ -68,9 +71,10 @@ export class CompaniesController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
   @ApiBearerAuth('access-token')
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Company)
   @Delete()
-  delete(@Req() req): any {
+  delete(@Req() req: Express.Request): any {
     const result = this.companiesService.delete(req.user);
     return result;
   }
@@ -85,9 +89,13 @@ export class CompaniesController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
   @ApiBearerAuth('access-token')
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Company)
   @Put()
-  updateProfile(@Req() req, @Body() updateData: CompanyDto): Promise<Company> {
+  updateProfile(
+    @Req() req: Express.Request,
+    @Body() updateData: CompanyDto,
+  ): Promise<Company> {
     const result = this.sharedDataAccessService.updateProfile<
       Company,
       CompanyDto
@@ -107,8 +115,12 @@ export class CompaniesController {
   @ApiResponse({ status: 422, description: 'Unprocessable entity' })
   @ApiBearerAuth('access-token')
   @Post('job')
-  @UseGuards(FirebaseAuthGuard)
-  createJob(@Req() req, @Body() updateData: CreateJobDto): Promise<Job> {
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Company)
+  createJob(
+    @Req() req: Express.Request,
+    @Body() updateData: CreateJobDto,
+  ): Promise<Job> {
     const result = this.companiesService.createJob(req.user, updateData);
     return result;
   }
@@ -126,12 +138,20 @@ export class CompaniesController {
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
   @ApiBearerAuth('access-token')
   @Get('job')
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Company)
   @SerializeOptions({
     excludePrefixes: ['_'],
   })
-  getJobs(@Req() req): Promise<Job[]> {
+  getJobs(@Req() req: Express.Request): Promise<Job[]> {
     const result = this.companiesService.getJobs(req.user.user_id);
     return result;
+  }
+
+  @Post('testmail')
+  sendTestMail(): void {
+    this.companiesService.sendTestMail().catch((err) => {
+      throw err;
+    });
   }
 }

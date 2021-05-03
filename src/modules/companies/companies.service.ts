@@ -15,22 +15,25 @@ import { Company } from './entities/company.entity';
 import { Job } from './entities/job.entity';
 import { v4 as uuid } from 'uuid';
 import { Collections } from 'src/common/enums/colletions.enum';
+import { MailEntity } from '../mail/entities/mail.entity';
+import { MailData } from '../mail/interfaces/mail-data.interface';
+import { AuthUser } from 'src/common/auth/auth-user.model';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
-    private mailService: MailService,
+    private readonly mailService: MailService,
     private sharedDataAccessService: SharedDataAccessService,
   ) {}
 
   async createCompany(
     company: CompanyDto,
-    _firebaseUser: any,
+    user: AuthUser,
   ): Promise<Company | any> {
     //build entity object (assign id and email from properties from firebase
-    const companyEntity = new Company(_firebaseUser.user_id, company);
+    const companyEntity = new Company(user.uid, company);
 
     //store entity in mongodb
     return this.mongodb
@@ -48,27 +51,24 @@ export class CompaniesService {
       });
   }
 
-  async delete(_firebaseUser: any): Promise<number> {
-    const _id = _firebaseUser.user_id;
+  async delete(user: AuthUser): Promise<void> {
     //TODO: check for unfinished but requested jobs -> reject
 
     //TODO: delete all job offers
 
-    //delete profile by id
-    const profileDeleteResult = await this.sharedDataAccessService
-      .deleteProfile(_id, Collections.Companies)
+    //delete profile and registry by id
+    await this.sharedDataAccessService
+      .deleteProfile(user, Collections.Companies)
       .catch((err) => {
         throw err;
       });
-    if (profileDeleteResult) return profileDeleteResult.deletedCount;
-    throw new InternalServerErrorException();
   }
 
-  async createJob(_firebaseUser: any, jobData: CreateJobDto): Promise<Job> {
+  async createJob(user: AuthUser, jobData: CreateJobDto): Promise<Job> {
     const id: string = uuid();
     const job = new Job(id, jobData);
     Object.assign(job, {
-      publisher_id: _firebaseUser.user_id,
+      publisher_id: user.uid,
     });
     return this.mongodb
       .collection('jobs')
@@ -100,5 +100,23 @@ export class CompaniesService {
         }
         throw new NotFoundException();
       });
+  }
+
+  async sendTestMail(): Promise<any> {
+    const result = await this.mailService.sendJobOffer(
+      <MailData>{
+        to: 'kev.ed.simon@gmail.com',
+        title: 'testanfrage',
+        url: 'http://google.com',
+        text1: 'text1 template',
+        text2: 'text2 template',
+      },
+      new MailEntity({
+        companyId: '1234company',
+        jobId: '1234jobid',
+        studentId: '1234studentid',
+      }),
+    );
+    return result;
   }
 }

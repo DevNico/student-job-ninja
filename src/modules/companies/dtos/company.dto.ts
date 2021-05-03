@@ -12,6 +12,7 @@ export class CompanyDto {
   @IsNotEmpty()
   email: string;
   @IsString()
+  @IsNotEmpty()
   @Length(1, 500)
   company_info: string;
   @IsOptional()

@@ -7,9 +7,12 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Db, DeleteWriteOpResultObject } from 'mongodb';
+import { AuthUser } from './common/auth/auth-user.model';
 import { Registry } from './common/entities/registry.entity';
 import { Collections } from './common/enums/colletions.enum';
 import { Role } from './common/enums/roles.enum';
+import { Company } from './modules/companies/entities/company.entity';
+import { Student } from './modules/students/entities/student.entity';
 import { Entity } from './providers/mongodb/entity.model';
 
 @Injectable()
@@ -25,8 +28,9 @@ export class SharedDataAccessService {
       .insertOne(registryEntry)
       .then((result) => {
         if (result && result.insertedCount > 0) {
+          console.log('inserted count', result.insertedCount);
           return true;
-        }
+        } else return false;
       })
       .catch((err) => {
         if (err.code === 11000) throw new NotAcceptableException();
@@ -34,8 +38,23 @@ export class SharedDataAccessService {
       });
   }
 
+  async getUserFromAuthStore(uid: string): Promise<Registry> {
+    console.log('uid: ', uid);
+    return this.mongodb
+      .collection(Collections.Registry)
+      .findOne({ _id: uid })
+      .then((result) => {
+        return result as Registry;
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.code === 404) throw new NotFoundException();
+        throw new InternalServerErrorException();
+      });
+  }
+
   //Get student or Company Profile by its ID
-  async getUserById<T extends Entity>(
+  async getUserById<T extends Entity = Student | Company>(
     id: string,
     collection: Collections,
   ): Promise<T> {
@@ -50,6 +69,7 @@ export class SharedDataAccessService {
       })
       .catch((err) => {
         console.error(err);
+        if (err.code != 404) throw new NotFoundException();
         throw new InternalServerErrorException();
       });
   }
@@ -78,20 +98,28 @@ export class SharedDataAccessService {
       });
   }
 
-  async deleteProfile(
-    userId: string,
-    collection: Collections,
-  ): Promise<DeleteWriteOpResultObject> {
-    const profileDeleteResult = await this.mongodb
+  async deleteProfile(user: AuthUser, collection: Collections): Promise<void> {
+    console.log(user.uid);
+    const profileDeleteResult = this.mongodb
       .collection(collection)
-      .deleteOne({ _id: userId })
+      .deleteOne({ _id: user.uid });
+    const registryDeletedResult = this.mongodb
+      .collection(Collections.Registry)
+      .deleteOne({ _id: user.uid });
+    Promise.all([profileDeleteResult, registryDeletedResult])
+      .then((resultValues) => {
+        if (
+          !resultValues[0] ||
+          !resultValues[1] ||
+          resultValues[0].deletedCount < 1 ||
+          resultValues[1].deletedCount < 1
+        )
+          console.log(resultValues[0].deletedCount);
+        //throw new InternalServerErrorException(); //TODO: error handling
+      })
       .catch((err) => {
         console.log(err);
         throw new InternalServerErrorException();
       });
-    if (profileDeleteResult.deletedCount > 0) {
-      return profileDeleteResult;
-    }
-    throw new UnprocessableEntityException();
   }
 }

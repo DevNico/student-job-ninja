@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Db } from 'mongodb';
+import { AuthUser } from 'src/common/auth/auth-user.model';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { MailService } from '../mail/mail.service';
@@ -21,7 +22,7 @@ export class StudentsService {
     private mongodb: Db,
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache, //TODO: testing
-    private mailService: MailService,
+    private readonly mailService: MailService,
     private sharedDataAccessService: SharedDataAccessService,
   ) {}
 
@@ -51,18 +52,15 @@ export class StudentsService {
     return result;
   }
 
-  async delete(_firebaseUser: any): Promise<number> {
-    const id = _firebaseUser.user_id;
+  async delete(user: AuthUser): Promise<void> {
     //TODO: check for unfinished but accepted jobs -> reject
     //TODO: delete accepted and finished jobs
 
     //delete profile by id
-    const profileDeleteResult = await this.sharedDataAccessService
-      .deleteProfile(id, Collections.Students)
+    await this.sharedDataAccessService
+      .deleteProfile(user, Collections.Students)
       .catch((err) => {
         throw err;
       });
-    if (profileDeleteResult) return profileDeleteResult.deletedCount;
-    throw new InternalServerErrorException();
   }
 }

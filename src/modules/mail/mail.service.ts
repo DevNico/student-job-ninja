@@ -5,25 +5,42 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { MailData } from './interfaces/mail-data.interface';
-import { Db } from 'mongodb';
+import { Db, InsertOneWriteOpResult } from 'mongodb';
 import { MailEntity } from './entities/mail.entity';
+import { join } from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class MailService {
   constructor(
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
+    private mailerService: MailerService,
   ) {}
-  private mailerService: MailerService;
 
   //send a job offer to student and replace template text with handlebars (context)
-  async sendJobOffer(mailData: MailData, mailEntity: MailEntity) {
+  async sendJobOffer(
+    mailData: MailData,
+    mailEntity: MailEntity,
+  ): Promise<InsertOneWriteOpResult<any>> {
+    const path = join(
+      process.cwd(),
+      'src',
+      'modules',
+      'mail',
+      'mail-templates',
+      'example.hbs',
+    );
+    if (!fs.existsSync(path)) {
+      console.log('PATH not available: ', path);
+      throw new InternalServerErrorException();
+    }
     return this.mailerService
       .sendMail({
         to: mailData.to,
         subject: 'subject',
         text: `text`,
-        template: 'example',
+        template: path,
         context: {
           title: mailData.title,
           url: mailData.url,

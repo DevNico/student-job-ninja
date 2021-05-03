@@ -5,7 +5,6 @@ import {
   Post,
   Put,
   Req,
-  UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -16,10 +15,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FirebaseAuthGuard } from 'src/common/auth/firebase-auth.guard';
+import { RolesGuard } from 'src/common/auth/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { Role } from 'src/common/enums/roles.enum';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { StudentDto } from './dtos/create-student.dto';
+import { UpdateStudentDto } from './dtos/update-student.dto';
 import { Student } from './entities/student.entity';
 import { StudentsService } from './students.service';
 
@@ -46,13 +48,15 @@ export class StudentsController {
   })
   @UseGuards(FirebaseAuthGuard)
   @Post('signup')
-  signup(@Req() req, @Body() studentData: StudentDto): any {
-    const registryCreated = this.sharedDataAccessService.addUserToAuthStore({
+  async signup(
+    @Req() req: Express.Request,
+    @Body() studentData: StudentDto,
+  ): Promise<any> {
+    await this.sharedDataAccessService.addUserToAuthStore({
       _id: req.user.user_id,
-      email: req.body.email,
+      email: studentData.email,
       roles: [Role.Student],
     });
-    if (!registryCreated) throw new UnprocessableEntityException();
     const result = this.studentsService.createStudent(studentData, req.user);
     return result;
   }
@@ -67,12 +71,16 @@ export class StudentsController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
   @ApiBearerAuth('access-token')
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Student)
   @Put()
-  updateProfile(@Req() req, @Body() updateData: StudentDto): Promise<Student> {
+  async updateProfile(
+    @Req() req: Express.Request,
+    @Body() updateData: UpdateStudentDto,
+  ): Promise<Student> {
     const result = this.sharedDataAccessService.updateProfile<
       Student,
-      StudentDto
+      UpdateStudentDto
     >(req.user.user_id, Collections.Students, updateData);
     return result;
   }
@@ -86,10 +94,10 @@ export class StudentsController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
   @ApiBearerAuth('access-token')
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Student)
   @Delete()
-  delete(@Req() req): any {
-    const result = this.studentsService.delete(req.user);
-    return result;
+  delete(@Req() req: Express.Request): Promise<void> {
+    return this.studentsService.delete(req.user);
   }
 }
