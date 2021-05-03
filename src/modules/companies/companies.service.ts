@@ -105,7 +105,7 @@ export class CompaniesService {
   async sendTestMail(): Promise<any> {
     const result = await this.mailService.sendJobOffer(
       <MailData>{
-        to: 'kev.ed.simon@gmail.com',
+        to: 'test@gmail.com',
         title: 'testanfrage',
         url: 'http://google.com',
         text1: 'text1 template',
