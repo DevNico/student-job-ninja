@@ -8,10 +8,11 @@ import {
 } from 'class-validator';
 import { Address } from 'src/common/models/address.model';
 
-export class CreateCompanyDto {
-  @IsOptional()
-  contact_mail: string;
+export class CompanyDto {
+  @IsNotEmpty()
+  email: string;
   @IsString()
+  @IsNotEmpty()
   @Length(1, 500)
   company_info: string;
   @IsOptional()

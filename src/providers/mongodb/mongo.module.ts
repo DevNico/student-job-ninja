@@ -1,8 +1,9 @@
-import { Logger } from '@nestjs/common';
+import { Global, Logger } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 import { MongoClient, Db } from 'mongodb';
 ///Module for async initialisation of the mongodb connection
 ///Can be injected by the provider name
+@Global()
 @Module({
   providers: [
     {
@@ -17,7 +18,7 @@ import { MongoClient, Db } from 'mongodb';
             useUnifiedTopology: true,
           });
           //select a database with the given name ( if not already existing, creates a new one)
-          const db = client.db('projectstore');
+          const db: Db = client.db('projectstore');
 
           await db
             .collection('init_collection')

@@ -1,7 +1,7 @@
-import * as path from 'path';
 import { Injectable } from '@nestjs/common';
 import { MailerOptions, MailerOptionsFactory } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
 
 @Injectable()
 export class MailConfigService implements MailerOptionsFactory {
@@ -26,13 +26,7 @@ export class MailConfigService implements MailerOptionsFactory {
       //load templates by path and set a handlebars adaperter
       // (used for replace text and url in email template)
       template: {
-        dir: path.join(
-          process.cwd(),
-          'src',
-          'modules',
-          'mail',
-          'mail-templates',
-        ),
+        dir: join(process.cwd(), 'src', 'modules', 'mail', 'mail-templates/'),
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,

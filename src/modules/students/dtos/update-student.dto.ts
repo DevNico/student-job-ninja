@@ -5,18 +5,14 @@ import {
   IsInt,
   IsNotEmpty,
   IsObject,
-  IsOptional,
   Max,
   Min,
   MinLength,
 } from 'class-validator';
 import { Address } from 'src/common/models/address.model';
-import { JobHistory } from '../models/job-history.model';
 import { University } from '../models/university.model';
 
-//validation for Json body of '/students/signup'
-//assigned to student object (persisted)
-export class StudentDto {
+export class UpdateStudentDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
@@ -51,17 +47,6 @@ export class StudentDto {
   @Min(1)
   @Max(20)
   semester: number;
-
-  @ApiProperty({
-    description: 'address field',
-    type: [JobHistory],
-  })
-  @IsOptional()
-  job_history: JobHistory[];
-
-  @IsNotEmpty()
-  @IsArray()
-  skills: string[];
 
   @IsArray()
   datesAvailable: string[];
