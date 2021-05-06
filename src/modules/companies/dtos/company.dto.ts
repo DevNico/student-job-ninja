@@ -18,9 +18,6 @@ export class CompanyDto {
   @IsOptional()
   homepage?: string;
 
-  @IsOptional()
-  image_url: string;
-
   @ApiProperty({
     description: 'address field',
     type: Address,

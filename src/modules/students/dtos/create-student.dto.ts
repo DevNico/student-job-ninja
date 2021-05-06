@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsObject,
   IsOptional,
+  IsString,
   Max,
   Min,
   MinLength,
@@ -28,6 +29,14 @@ export class StudentDto {
   @IsNotEmpty()
   @MinLength(2)
   lastName: string;
+
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @IsInt()
+  @Max(100)
+  yearsOfExperience = 0;
 
   @ApiProperty({
     description: 'address field',
@@ -57,7 +66,7 @@ export class StudentDto {
     type: [JobHistory],
   })
   @IsOptional()
-  job_history: JobHistory[];
+  job_history: JobHistory[] = [];
 
   @IsNotEmpty()
   @IsArray()
@@ -70,4 +79,7 @@ export class StudentDto {
   @Min(1)
   @Max(2)
   workBasis: number;
+
+  @IsString()
+  workArea: string;
 }

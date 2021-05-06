@@ -5,6 +5,8 @@ import {
   IsInt,
   IsNotEmpty,
   IsObject,
+  IsOptional,
+  IsString,
   Max,
   Min,
   MinLength,
@@ -48,6 +50,11 @@ export class UpdateStudentDto {
   @Max(20)
   semester: number;
 
+  @IsNotEmpty()
+  @IsInt()
+  @Max(100)
+  yearsOfExperience: number;
+
   @IsArray()
   datesAvailable: string[];
 
@@ -55,4 +62,11 @@ export class UpdateStudentDto {
   @Min(1)
   @Max(2)
   workBasis: number;
+
+  @IsString()
+  workArea: string;
+
+  @IsString()
+  @IsOptional()
+  description: string;
 }
