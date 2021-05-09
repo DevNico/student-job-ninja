@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsEmail,
@@ -10,6 +11,7 @@ import {
   Max,
   Min,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { Address } from 'src/common/models/address.model';
 import { University } from '../models/university.model';
@@ -32,7 +34,8 @@ export class UpdateStudentDto {
     type: Address,
   })
   @IsNotEmpty()
-  @IsObject()
+  @ValidateNested()
+  @Type(() => Address)
   address: Address;
 
   @ApiProperty({
@@ -41,7 +44,8 @@ export class UpdateStudentDto {
     required: true,
   })
   @IsNotEmpty()
-  @IsObject()
+  @ValidateNested()
+  @Type(() => University)
   university: University;
 
   @IsNotEmpty()

@@ -9,5 +9,13 @@ services:
       MONGO_INITDB_DATABASE: 'projectstore'
     ports:
       - '27017:27017'
-#    volumes:
-#      - ./mongodb_vol:/data/db
+  #    volumes:
+  #      - ./mongodb_vol:/data/db
+  #redis container for Bull queue and Cache
+  redis:
+    image: redis:rc-alpine3.13
+    container_name: redis
+    #volumes:
+    #  - ./redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - '6379:6379'
