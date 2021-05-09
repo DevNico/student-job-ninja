@@ -9,8 +9,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     CacheModule.register({
       ttl: 5,
       store: redisStore,
-      host: 'localhost',
-      port: 6379,
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT, 10),
     }),
   ],
   providers: [

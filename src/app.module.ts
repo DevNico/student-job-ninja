@@ -13,6 +13,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { StudentsService } from './modules/students/students.service';
 import { FirebaseAdminModule } from './providers/firebase/firebase-admin.module';
 import { SharedDataAccessService } from './shared-data-access.service';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -22,6 +23,12 @@ import { SharedDataAccessService } from './shared-data-access.service';
     MailerModule.forRootAsync({
       useClass: MailConfigService,
     }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT, 10),
+      },
+    }),
     MongoModule,
     StudentsModule,
     CompaniesModule,
@@ -29,7 +36,7 @@ import { SharedDataAccessService } from './shared-data-access.service';
     FirebaseAdminModule,
     MailModule,
   ],
-  exports: [FirebaseStrategy, FirebaseAdminModule],
+  exports: [FirebaseStrategy, FirebaseAdminModule, BullModule],
   controllers: [AppController],
   providers: [StudentsService, CompaniesService, SharedDataAccessService],
 })

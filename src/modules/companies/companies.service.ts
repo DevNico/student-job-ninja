@@ -18,10 +18,13 @@ import { Collections } from 'src/common/enums/colletions.enum';
 import { MailEntity } from '../mail/entities/mail.entity';
 import { MailData } from '../mail/interfaces/mail-data.interface';
 import { AuthUser } from 'src/common/auth/auth-user.model';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class CompaniesService {
   constructor(
+    @InjectQueue('jobprocessor') private jobProcessorQueue: Queue,
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
     private readonly mailService: MailService,
