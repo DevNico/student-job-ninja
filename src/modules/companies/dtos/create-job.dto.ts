@@ -21,8 +21,7 @@ export class CreateJobDto {
   @Length(1, 500)
   jobDescription: string;
 
-  @IsString()
-  @Length(1, 500)
+  @IsArray()
   jobQualifications: string[];
 
   @IsNotEmpty()

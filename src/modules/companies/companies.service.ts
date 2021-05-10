@@ -80,9 +80,17 @@ export class CompaniesService {
         console.log(err);
         throw new InternalServerErrorException();
       })
-      .then((result) => {
+      .then(async (result) => {
         if (result.insertedCount > 0) {
-          return job;
+          //TODO: check
+          await this.jobProcessorQueue
+            .add('match', job, { lifo: true })
+            .catch((err) => {
+              throw err;
+            })
+            .then(() => {
+              return job;
+            });
         }
         throw new UnprocessableEntityException();
       });

@@ -148,10 +148,24 @@ export class CompaniesController {
     return result;
   }
 
+  ////////////////////tests
+
   @Post('testmail')
   sendTestMail(): void {
     this.companiesService.sendTestMail().catch((err) => {
       throw err;
     });
+  }
+
+  @ApiBearerAuth('access-token')
+  @Post('jobtest')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Company)
+  createTestJob(
+    @Req() req: Express.Request,
+    @Body() updateData: CreateJobDto,
+  ): Promise<Job> {
+    const result = this.companiesService.createJob(req.user, updateData);
+    return result;
   }
 }
