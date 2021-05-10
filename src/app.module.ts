@@ -1,6 +1,6 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StudentsModule } from 'src/modules/students/students.module';
 import { MongoModule } from 'src/providers/mongodb/mongo.module';
 import { AppController } from './app.controller';
@@ -23,11 +23,15 @@ import { BullModule } from '@nestjs/bull';
     MailerModule.forRootAsync({
       useClass: MailConfigService,
     }),
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: parseInt(process.env.REDIS_PORT, 10),
-      },
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
+        },
+      }),
     }),
     MongoModule,
     StudentsModule,
