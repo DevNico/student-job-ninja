@@ -1,10 +1,11 @@
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
-  IsObject,
   IsOptional,
   IsString,
   Length,
+  ValidateNested,
 } from 'class-validator';
 import { Address } from 'src/common/models/address.model';
 
@@ -18,14 +19,12 @@ export class CompanyDto {
   @IsOptional()
   homepage?: string;
 
-  @IsOptional()
-  image_url: string;
-
   @ApiProperty({
     description: 'address field',
     type: Address,
   })
   @IsNotEmpty()
-  @IsObject()
+  @ValidateNested()
+  @Type(() => Address)
   address: Address;
 }

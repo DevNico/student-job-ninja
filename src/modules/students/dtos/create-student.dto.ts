@@ -1,14 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsEmail,
   IsInt,
   IsNotEmpty,
-  IsObject,
   IsOptional,
+  IsString,
   Max,
   Min,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { Address } from 'src/common/models/address.model';
 import { JobHistory } from '../models/job-history.model';
@@ -29,12 +31,21 @@ export class StudentDto {
   @MinLength(2)
   lastName: string;
 
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @IsInt()
+  @Max(100)
+  yearsOfExperience = 0;
+
   @ApiProperty({
     description: 'address field',
     type: Address,
   })
   @IsNotEmpty()
-  @IsObject()
+  @ValidateNested()
+  @Type(() => Address)
   address: Address;
 
   @ApiProperty({
@@ -43,7 +54,8 @@ export class StudentDto {
     required: true,
   })
   @IsNotEmpty()
-  @IsObject()
+  @ValidateNested()
+  @Type(() => University)
   university: University;
 
   @IsNotEmpty()
@@ -57,7 +69,9 @@ export class StudentDto {
     type: [JobHistory],
   })
   @IsOptional()
-  job_history: JobHistory[];
+  @ValidateNested({ each: true })
+  @Type(() => JobHistory)
+  job_history: JobHistory[] = [];
 
   @IsNotEmpty()
   @IsArray()
@@ -70,4 +84,7 @@ export class StudentDto {
   @Min(1)
   @Max(2)
   workBasis: number;
+
+  @IsString()
+  workArea: string;
 }

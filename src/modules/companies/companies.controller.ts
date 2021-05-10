@@ -137,7 +137,7 @@ export class CompaniesController {
   @ApiResponse({ status: 404, description: 'No Jobs found' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
   @ApiBearerAuth('access-token')
-  @Get('job')
+  @Get('jobs')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Company)
   @SerializeOptions({

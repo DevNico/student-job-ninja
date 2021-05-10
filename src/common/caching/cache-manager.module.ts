@@ -1,3 +1,4 @@
+import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule, Module, CacheInterceptor, Global } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
@@ -7,6 +8,9 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     //register Cache Module gloablly with default key ttl of 5 seconds
     CacheModule.register({
       ttl: 5,
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT, 10),
     }),
   ],
   providers: [
