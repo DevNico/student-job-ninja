@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsEmail,
   IsInt,
@@ -68,16 +70,28 @@ export class StudentDto {
     description: 'address field',
     type: [JobHistory],
   })
+  //FIXME: remove
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => JobHistory)
   job_history: JobHistory[] = [];
 
   @IsNotEmpty()
+  @IsString({ each: true })
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(15)
   skills: string[];
 
+  @IsNotEmpty()
+  @IsString({ each: true })
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(15)
+  languages: string[];
+
+  @IsArray()
+  @IsString({ each: true })
   datesAvailable: string[];
 
   @IsInt() //full-time: 1 //half-time: 2

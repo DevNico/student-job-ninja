@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsEmail,
   IsInt,
   IsNotEmpty,
-  IsObject,
   IsOptional,
   IsString,
   Max,
@@ -55,11 +56,26 @@ export class UpdateStudentDto {
   semester: number;
 
   @IsNotEmpty()
+  @IsString({ each: true })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(15)
+  skills: string[];
+
+  @IsNotEmpty()
+  @IsString({ each: true })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(15)
+  languages: string[];
+
+  @IsNotEmpty()
   @IsInt()
   @Max(100)
   yearsOfExperience: number;
 
   @IsArray()
+  @IsString({ each: true })
   datesAvailable: string[];
 
   @IsInt() //full-time: 1 //half-time: 2

@@ -21,6 +21,7 @@ export class Student extends Entity {
   job_history?: JobHistory[];
   jobsMarkedIds?: string[];
   skills: string[];
+  languages: string[];
   datesAvailable: string[];
   workArea: string; //frontend, backend, fullstack
   workBasis: number;
