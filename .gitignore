@@ -38,3 +38,6 @@ lerna-debug.log*
 
 #firbase credentials
 firebase-admin-credentials.json
+
+#openapi spec
+openapi.json
