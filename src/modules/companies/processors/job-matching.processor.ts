@@ -1,4 +1,5 @@
 import {
+  InjectQueue,
   OnQueueActive,
   OnQueueCompleted,
   OnQueueFailed,
@@ -6,13 +7,14 @@ import {
   Processor,
 } from '@nestjs/bull';
 import { Inject, Logger } from '@nestjs/common';
-import { Job as BullJob } from 'bull';
+import { Job as BullJob, Queue } from 'bull';
 import { Db, InsertOneWriteOpResult } from 'mongodb';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { MailEntity } from 'src/modules/mail/entities/mail.entity';
 import { MailData } from 'src/modules/mail/interfaces/mail-data.interface';
 import { MailService } from 'src/modules/mail/mail.service';
 import { Student } from 'src/modules/students/entities/student.entity';
+import { StudentMatch } from 'src/modules/students/models/student-match.model';
 import { Company } from '../entities/company.entity';
 import { Job } from '../entities/job.entity';
 
@@ -28,6 +30,8 @@ export class JobProcessor {
   constructor(
     @Inject('MONGO_CONNECTION')
     private readonly mongodb: Db,
+    @InjectQueue('cronprocessor')
+    private cronProcessorQueue: Queue,
     private readonly mailService: MailService,
   ) {
     this.logger.log('Processor started');
@@ -62,7 +66,7 @@ export class JobProcessor {
   @Process('match')
   async matchJob(job: BullJob<Job>): Promise<number> {
     this.logger.log(`match new created job '${JSON.stringify(job.data)}'`);
-    const minSkillsRequired = 2;
+    const minSkillsRequired = 1;
     const matchingLimit = 25;
 
     const company = await this.findCompany(job.data);
@@ -80,12 +84,24 @@ export class JobProcessor {
       );
       return sentMails;
     } else {
-      //TODO: add to second queue
+      //FIXME: test
+      console.log('no match found send to second queue');
+      await this.cronProcessorQueue
+        .add('match', job, {
+          repeat: {
+            every: 86400000, //check every day
+            limit: 100,
+          },
+        })
+        .catch((err) => {
+          throw err;
+        });
+      return 0;
     }
   }
 
   private async sendMailToMatches(
-    students: Student[],
+    students: StudentMatch[],
     job: Job,
     company: Company,
   ): Promise<number> {
@@ -110,10 +126,12 @@ export class JobProcessor {
 
   private async sendJobRequestMail(
     job: Job,
-    student: Student,
+    student: StudentMatch,
     company: Company,
   ): Promise<InsertOneWriteOpResult<MailEntity>> {
     //TODO: update email template and text
+    //TODO: REMOVE MOCK
+    return <InsertOneWriteOpResult<MailEntity>>{ insertedCount: 1 };
     const result = await this.mailService.sendJobOffer(
       <MailData>{
         to: student.email,
@@ -135,7 +153,7 @@ export class JobProcessor {
     job: Job,
     minSkillsRequired: number,
     matchingLimit: number,
-  ): Promise<Student[]> {
+  ): Promise<StudentMatch[]> {
     return this.mongodb
       .collection(Collections.Students)
       .aggregate(
@@ -145,9 +163,14 @@ export class JobProcessor {
           //and correct language
           {
             $match: {
-              workBasis: 1,
-              languages: job.languages, //e.g. german
+              workBasis: job.workBasis, //e.g. 1
               workArea: job.workArea, //e.g. fullstack
+              $expr: {
+                $setIsSubset: [
+                  job.languages, //e.g. ['2021-03-20', '2020-11-20']
+                  '$languages',
+                ],
+              },
             },
           },
           //Stage 2:
@@ -155,11 +178,11 @@ export class JobProcessor {
           //Student should be available on all days set in the job posting
           {
             $match: {
-              $expr: {
-                $setIsSubset: [
-                  job.workDays, //e.g. ['2021-03-20', '2020-11-20']
-                  '$datesAvailable',
-                ],
+              fromAvailable: {
+                $gte: new Date(job.from),
+              },
+              toAvailable: {
+                $gte: new Date(job.to),
               },
             },
           },
@@ -191,7 +214,6 @@ export class JobProcessor {
               fistName: 1,
               lastName: 1,
               skills: 1,
-              datesAvailable: 1,
               matchSkillsCount: 1,
             },
           },
@@ -202,6 +224,7 @@ export class JobProcessor {
               matchSkillsCount: -1,
             },
           },
+
           //Stage 7:
           //Limit results for subsequent processing
           {

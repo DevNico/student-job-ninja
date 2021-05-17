@@ -10,13 +10,22 @@ import { JobProcessor } from './processors/job-matching.processor';
 
 @Module({
   imports: [
-    BullModule.registerQueue({
-      name: 'jobprocessor',
-      defaultJobOptions: {
-        removeOnComplete: true,
-        removeOnFail: true,
+    BullModule.registerQueue(
+      {
+        name: 'jobprocessor',
+        defaultJobOptions: {
+          removeOnComplete: true,
+          removeOnFail: true,
+        },
       },
-    }),
+      {
+        name: 'cronprocessor',
+        defaultJobOptions: {
+          removeOnComplete: true,
+          removeOnFail: true,
+        },
+      },
+    ),
     MongoModule,
     FirebaseStrategy,
     MailModule,

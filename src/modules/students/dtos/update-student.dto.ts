@@ -4,6 +4,7 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsArray,
+  IsDate,
   IsEmail,
   IsInt,
   IsNotEmpty,
@@ -74,9 +75,14 @@ export class UpdateStudentDto {
   @Max(100)
   yearsOfExperience: number;
 
-  @IsArray()
-  @IsString({ each: true })
-  datesAvailable: string[];
+  @IsNotEmpty()
+  @Type(() => Date)
+  @IsDate()
+  fromAvailable: Date;
+  @IsNotEmpty()
+  @Type(() => Date)
+  @IsDate()
+  toAvailable: Date;
 
   @IsInt() //full-time: 1 //half-time: 2
   @Min(1)

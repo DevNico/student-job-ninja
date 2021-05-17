@@ -70,29 +70,24 @@ export class CompaniesService {
   async createJob(user: AuthUser, jobData: CreateJobDto): Promise<Job> {
     const id: string = uuid();
     const job = new Job(id, jobData);
+    console.log('createJob');
     Object.assign(job, {
       publisher_id: user.uid,
     });
     return this.mongodb
       .collection('jobs')
       .insertOne(job)
+      .then((result) => {
+        console.log('inserted: ' + result.insertedCount);
+        if (result.insertedCount > 0) {
+          return this.jobProcessorQueue.add('match', job, {});
+        }
+      })
+      .then((result) => console.log(result))
+      .then(() => job)
       .catch((err) => {
         console.log(err);
         throw new InternalServerErrorException();
-      })
-      .then(async (result) => {
-        if (result.insertedCount > 0) {
-          //TODO: check
-          await this.jobProcessorQueue
-            .add('match', job, { lifo: true })
-            .catch((err) => {
-              throw err;
-            })
-            .then(() => {
-              return job;
-            });
-        }
-        throw new UnprocessableEntityException();
       });
   }
 

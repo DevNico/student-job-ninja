@@ -22,7 +22,8 @@ export class Student extends Entity {
   jobsMarkedIds?: string[];
   skills: string[];
   languages: string[];
-  datesAvailable: string[];
+  fromAvailable: Date;
+  toAvailable: Date;
   workArea: string; //frontend, backend, fullstack
   workBasis: number;
 

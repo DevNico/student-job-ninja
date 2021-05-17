@@ -1,10 +1,15 @@
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
+  IsDate,
   IsEmail,
+  IsInt,
   IsNotEmpty,
   IsString,
   Length,
+  Max,
+  Min,
 } from 'class-validator';
 
 export class CreateJobDto {
@@ -33,16 +38,22 @@ export class CreateJobDto {
   @IsString()
   workArea: string;
 
+  @IsInt() //full-time: 1 //half-time: 2
+  @Min(1)
+  @Max(2)
+  workBasis: number;
+
   @IsNotEmpty()
   @IsArray()
   languages: string[];
 
   //TODO: convert to date?
   @IsNotEmpty()
-  from: string;
+  @Type(() => Date)
+  @IsDate()
+  from: Date;
   @IsNotEmpty()
-  to: string;
-
-  @IsNotEmpty()
-  workDays: number;
+  @Type(() => Date)
+  @IsDate()
+  to: Date;
 }
