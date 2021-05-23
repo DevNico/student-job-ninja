@@ -10,9 +10,9 @@ import { Db } from 'mongodb';
 import { AuthUser } from 'src/common/auth/auth-user.model';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
-import { MailService } from '../mail/mail.service';
-import { StudentDto } from './dtos/create-student.dto';
-import { Student } from './entities/student.entity';
+import { MailService } from '../../mail/mail.service';
+import { StudentDto } from '../dtos/create-student.dto';
+import { Student } from '../entities/student.entity';
 
 @Injectable()
 export class StudentsService {

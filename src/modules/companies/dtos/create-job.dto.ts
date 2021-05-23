@@ -47,7 +47,6 @@ export class CreateJobDto {
   @IsArray()
   languages: string[];
 
-  //TODO: convert to date?
   @IsNotEmpty()
   @Type(() => Date)
   @IsDate()

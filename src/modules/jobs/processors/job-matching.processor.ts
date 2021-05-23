@@ -13,10 +13,9 @@ import { Collections } from 'src/common/enums/colletions.enum';
 import { MailEntity } from 'src/modules/mail/entities/mail.entity';
 import { MailData } from 'src/modules/mail/interfaces/mail-data.interface';
 import { MailService } from 'src/modules/mail/mail.service';
-import { Student } from 'src/modules/students/entities/student.entity';
 import { StudentMatch } from 'src/modules/students/models/student-match.model';
-import { Company } from '../entities/company.entity';
-import { Job } from '../entities/job.entity';
+import { Company } from '../../companies/entities/company.entity';
+import { Job } from '../../companies/entities/job.entity';
 
 /**
  * queue processor for matching new jobs and send mails to students
@@ -30,8 +29,8 @@ export class JobProcessor {
   constructor(
     @Inject('MONGO_CONNECTION')
     private readonly mongodb: Db,
-    @InjectQueue('cronprocessor')
-    private cronProcessorQueue: Queue,
+    @InjectQueue('jobprocessor')
+    private jobProcessorQueue: Queue,
     private readonly mailService: MailService,
   ) {
     this.logger.log('Processor started');
@@ -61,11 +60,27 @@ export class JobProcessor {
       `Failed job ${job.id} of type ${job.name}: ${error.message}`,
       error.stack,
     );
+    this.jobProcessorQueue
+      .add('match', job, {
+        delay: 86400000, //repeat matching after one day
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 
   @Process('match')
   async matchJob(job: BullJob<Job>): Promise<number> {
-    this.logger.log(`match new created job '${JSON.stringify(job.data)}'`);
+    this.logger.log(`match job: '${JSON.stringify(job.data)}'`);
+    const now = new Date(Date.now());
+    if (
+      job.data.from.getFullYear == now.getFullYear &&
+      job.data.from.getMonth == now.getMonth &&
+      job.data.from.getDay == now.getDay
+    ) {
+      this.logger.log(`Job outdated: '${JSON.stringify(job.data)}'`);
+      return 0;
+    }
     const minSkillsRequired = 1;
     const matchingLimit = 25;
 
@@ -86,12 +101,9 @@ export class JobProcessor {
     } else {
       //FIXME: test
       console.log('no match found send to second queue');
-      await this.cronProcessorQueue
+      await this.jobProcessorQueue
         .add('match', job, {
-          repeat: {
-            every: 86400000, //check every day
-            limit: 100,
-          },
+          delay: 86400000,
         })
         .catch((err) => {
           throw err;
@@ -167,7 +179,7 @@ export class JobProcessor {
               workArea: job.workArea, //e.g. fullstack
               $expr: {
                 $setIsSubset: [
-                  job.languages, //e.g. ['2021-03-20', '2020-11-20']
+                  job.languages, //e.g. ['german', 'english']
                   '$languages',
                 ],
               },

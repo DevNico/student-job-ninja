@@ -143,8 +143,8 @@ export class CompaniesController {
   @SerializeOptions({
     excludePrefixes: ['_'],
   })
-  getJobs(@Req() req: Express.Request): Promise<Job[]> {
-    const result = this.companiesService.getJobs(req.user.user_id);
+  getJobsByCompany(@Req() req: Express.Request): Promise<Job[]> {
+    const result = this.companiesService.getOwnPublishedJobs(req.user.user_id);
     return result;
   }
 

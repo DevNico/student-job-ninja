@@ -23,7 +23,7 @@ import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { StudentDto } from './dtos/create-student.dto';
 import { UpdateStudentDto } from './dtos/update-student.dto';
 import { Student } from './entities/student.entity';
-import { StudentsService } from './students.service';
+import { StudentsService } from './services/students.service';
 
 @Controller('students')
 export class StudentsController {

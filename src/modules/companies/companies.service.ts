@@ -91,9 +91,9 @@ export class CompaniesService {
       });
   }
 
-  async getJobs(userId: string): Promise<Job[]> {
+  async getOwnPublishedJobs(userId: string): Promise<Job[]> {
     return this.mongodb
-      .collection('jobs')
+      .collection(Collections.jobs)
       .find({ publisher_id: userId })
       .toArray()
       .catch((err) => {

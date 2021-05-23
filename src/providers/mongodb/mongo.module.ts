@@ -27,6 +27,12 @@ import { Collections } from 'src/common/enums/colletions.enum';
           await db
             .collection(Collections.Students)
             .createIndex({ id: 1 }, { unique: true, sparse: true });
+          await db
+            .collection(Collections.Companies)
+            .createIndex({ id: 1 }, { unique: true, sparse: true });
+          await db
+            .collection(Collections.jobs)
+            .createIndex({ jobName: 'text', jobDescription: 'text' });
           return db;
         } catch (e) {
           throw e;

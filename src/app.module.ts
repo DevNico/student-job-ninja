@@ -10,7 +10,7 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { CompaniesService } from './modules/companies/companies.service';
 import { MailConfigService } from './modules/mail/mail-config.service';
 import { MailModule } from './modules/mail/mail.module';
-import { StudentsService } from './modules/students/students.service';
+import { StudentsService } from './modules/students/services/students.service';
 import { FirebaseAdminModule } from './providers/firebase/firebase-admin.module';
 import { SharedDataAccessService } from './shared-data-access.service';
 import { BullModule } from '@nestjs/bull';
