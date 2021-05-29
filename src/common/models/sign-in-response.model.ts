@@ -1,6 +1,7 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { Company } from 'src/modules/companies/entities/company.entity';
 import { Job } from 'src/modules/companies/entities/job.entity';
+import { JobWithCompany } from 'src/modules/jobs/models/job-with-company.model';
 import { Student } from 'src/modules/students/entities/student.entity';
 
 export class UserResponse {
@@ -16,5 +17,5 @@ export class UserResponse {
   })
   userData: Student | Company;
 
-  assignedJobs: Job[];
+  assignedJobs: Job[] | JobWithCompany[];
 }

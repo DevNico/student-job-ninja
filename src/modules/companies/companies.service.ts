@@ -73,6 +73,7 @@ export class CompaniesService {
     console.log('createJob');
     Object.assign(job, {
       publisher_id: user.uid,
+      active: true,
     });
     return this.mongodb
       .collection('jobs')

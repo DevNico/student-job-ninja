@@ -13,6 +13,7 @@ import { Collections } from './common/enums/colletions.enum';
 import { Role } from './common/enums/roles.enum';
 import { Company } from './modules/companies/entities/company.entity';
 import { Job } from './modules/companies/entities/job.entity';
+import { JobWithCompany } from './modules/jobs/models/job-with-company.model';
 import { Student } from './modules/students/entities/student.entity';
 import { Entity } from './providers/mongodb/entity.model';
 
@@ -40,7 +41,6 @@ export class SharedDataAccessService {
   }
 
   async getUserFromAuthStore(uid: string): Promise<Registry> {
-    console.log('uid: ', uid);
     return this.mongodb
       .collection(Collections.Registry)
       .findOne({ _id: uid })
@@ -124,10 +124,34 @@ export class SharedDataAccessService {
       });
   }
 
-  async findStudentAssignedJobs(userId: string): Promise<Job[]> {
+  async findStudentAssignedJobs(userId: string): Promise<JobWithCompany[]> {
     return this.mongodb
       .collection(Collections.jobs)
-      .find({ final_accepted_id: userId })
+      .aggregate(
+        [
+          {
+            $match: {
+              final_accepted_id: userId,
+            },
+          },
+          {
+            $lookup: {
+              from: 'companies',
+              localField: 'publisher_id',
+              foreignField: '_id',
+              as: 'publisher',
+            },
+          },
+          {
+            $addFields: {
+              publisher: {
+                $arrayElemAt: ['$publisher', 0],
+              },
+            },
+          },
+        ],
+        { allowDiskUse: true },
+      )
       .toArray();
   }
 

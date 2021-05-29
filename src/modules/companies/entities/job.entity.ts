@@ -14,6 +14,7 @@ export class Job extends Entity {
   languages: string[];
   from: Date;
   to: Date;
+  active: boolean;
   requested_ids: string[];
   final_accepted_id: string[];
 

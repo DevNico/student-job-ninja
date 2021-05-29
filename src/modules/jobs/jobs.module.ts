@@ -5,9 +5,13 @@ import { MailModule } from '../mail/mail.module';
 import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
 import { JobProcessor } from './processors/job-matching.processor';
+import { ScheduleModule } from '@nestjs/schedule';
+import { JobActiveCronTask } from './processors/job-active-cron.processor';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
+
     BullModule.registerQueue({
       name: 'jobprocessor',
       defaultJobOptions: {
@@ -19,7 +23,7 @@ import { JobProcessor } from './processors/job-matching.processor';
     MailModule,
   ],
   controllers: [JobsController],
-  providers: [JobsService, JobProcessor],
+  providers: [JobsService, JobProcessor, JobActiveCronTask],
   exports: [BullModule],
 })
 export class JobsModule {}

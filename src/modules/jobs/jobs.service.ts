@@ -65,7 +65,7 @@ export class JobsService {
     const aggMatchQuery = [];
     if (searchQuery.searchString && searchQuery.searchString.length > 0) {
       aggMatchQuery.push({
-        $match: { $text: { $search: searchQuery.searchString } },
+        $match: { $text: { $search: searchQuery.searchString }, active: true },
       });
     }
     if (searchQuery.workArea && searchQuery.workArea.length > 0) {

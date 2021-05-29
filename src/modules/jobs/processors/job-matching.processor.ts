@@ -73,12 +73,16 @@ export class JobProcessor {
   async matchJob(job: BullJob<Job>): Promise<number> {
     this.logger.log(`match job: '${JSON.stringify(job.data)}'`);
     const now = new Date(Date.now());
+    //todo replace with active field
     if (
       job.data.from.getFullYear == now.getFullYear &&
       job.data.from.getMonth == now.getMonth &&
       job.data.from.getDay == now.getDay
     ) {
       this.logger.log(`Job outdated: '${JSON.stringify(job.data)}'`);
+      return 0;
+    }
+    if (!job.data.active) {
       return 0;
     }
     const minSkillsRequired = 1;
