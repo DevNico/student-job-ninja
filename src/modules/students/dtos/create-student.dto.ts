@@ -16,7 +16,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Address } from 'src/common/models/address.model';
-import { JobHistory } from '../models/job-history.model';
 import { University } from '../models/university.model';
 
 //validation for Json body of '/students/signup'
@@ -66,16 +65,6 @@ export class StudentDto {
   @Min(1)
   @Max(20)
   semester: number;
-
-  @ApiProperty({
-    description: 'address field',
-    type: [JobHistory],
-  })
-  //FIXME: remove
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => JobHistory)
-  job_history: JobHistory[] = [];
 
   @IsNotEmpty()
   @IsString({ each: true })

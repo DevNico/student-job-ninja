@@ -1,6 +1,5 @@
 import { Address } from 'src/common/models/address.model';
 import { Entity } from 'src/providers/mongodb/entity.model';
-import { JobHistory } from '../models/job-history.model';
 import { University } from '../models/university.model';
 
 //entity frame Object
@@ -18,7 +17,6 @@ export class Student extends Entity {
   address: Address;
   university: University;
   semester: number;
-  job_history?: JobHistory[];
   jobsMarkedIds?: string[];
   skills: string[];
   languages: string[];

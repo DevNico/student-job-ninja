@@ -1,8 +1,9 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { Company } from 'src/modules/companies/entities/company.entity';
+import { Job } from 'src/modules/companies/entities/job.entity';
 import { Student } from 'src/modules/students/entities/student.entity';
 
-export class SignInResponse {
+export class UserResponse {
   @ApiProperty({
     description: 'student or company',
     type: String,
@@ -14,4 +15,6 @@ export class SignInResponse {
     oneOf: [{ $ref: getSchemaPath(Student) }, { $ref: getSchemaPath(Company) }],
   })
   userData: Student | Company;
+
+  assignedJobs: Job[];
 }

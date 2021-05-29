@@ -6,12 +6,13 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { Db, DeleteWriteOpResultObject } from 'mongodb';
+import { Db } from 'mongodb';
 import { AuthUser } from './common/auth/auth-user.model';
 import { Registry } from './common/entities/registry.entity';
 import { Collections } from './common/enums/colletions.enum';
 import { Role } from './common/enums/roles.enum';
 import { Company } from './modules/companies/entities/company.entity';
+import { Job } from './modules/companies/entities/job.entity';
 import { Student } from './modules/students/entities/student.entity';
 import { Entity } from './providers/mongodb/entity.model';
 
@@ -59,7 +60,7 @@ export class SharedDataAccessService {
     collection: Collections,
   ): Promise<T> {
     //404 if no entry found
-    //500 if database error occured
+    //500 if database error occurred
     return this.mongodb
       .collection(collection)
       .findOne({ _id: id })
@@ -121,5 +122,19 @@ export class SharedDataAccessService {
         console.log(err);
         throw new InternalServerErrorException();
       });
+  }
+
+  async findStudentAssignedJobs(userId: string): Promise<Job[]> {
+    return this.mongodb
+      .collection(Collections.jobs)
+      .find({ final_accepted_id: userId })
+      .toArray();
+  }
+
+  async findCompanyAssignedJobs(userId: string): Promise<Job[]> {
+    return this.mongodb
+      .collection(Collections.jobs)
+      .find({ publisher_id: userId })
+      .toArray();
   }
 }
