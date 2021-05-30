@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
+  IsDate,
   IsEmail,
   IsInt,
   IsNotEmpty,
@@ -13,7 +16,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Address } from 'src/common/models/address.model';
-import { JobHistory } from '../models/job-history.model';
 import { University } from '../models/university.model';
 
 //validation for Json body of '/students/signup'
@@ -64,21 +66,28 @@ export class StudentDto {
   @Max(20)
   semester: number;
 
-  @ApiProperty({
-    description: 'address field',
-    type: [JobHistory],
-  })
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => JobHistory)
-  job_history: JobHistory[] = [];
-
   @IsNotEmpty()
+  @IsString({ each: true })
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(15)
   skills: string[];
 
+  @IsNotEmpty()
+  @IsString({ each: true })
   @IsArray()
-  datesAvailable: string[];
+  @ArrayMinSize(1)
+  @ArrayMaxSize(15)
+  languages: string[];
+
+  @IsNotEmpty()
+  @Type(() => Date)
+  @IsDate()
+  fromAvailable: Date;
+  @IsNotEmpty()
+  @Type(() => Date)
+  @IsDate()
+  toAvailable: Date;
 
   @IsInt() //full-time: 1 //half-time: 2
   @Min(1)

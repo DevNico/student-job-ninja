@@ -10,13 +10,14 @@ export class Job extends Entity {
   skills: string[];
   //TODO: enum
   workArea: string;
+  workBasis: number;
   languages: string[];
-  //TODO: convert as date
-  from: string;
-  to: string;
-  workDays: number;
+  from: Date;
+  to: Date;
+  active: boolean;
+  requested_by_students: string[];
   requested_ids: string[];
-  final_accepted_id: string[];
+  final_accepted_id = '';
 
   constructor(id, partial: Partial<Job>) {
     super(id);

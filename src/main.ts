@@ -12,7 +12,7 @@ async function bootstrap() {
     next();
   });
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const config = new DocumentBuilder()
     .setTitle('JS-SS21 API Documentation')

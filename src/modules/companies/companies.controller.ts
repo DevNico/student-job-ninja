@@ -9,6 +9,7 @@ import {
   Put,
   Get,
   SerializeOptions,
+  Param,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -143,15 +144,60 @@ export class CompaniesController {
   @SerializeOptions({
     excludePrefixes: ['_'],
   })
-  getJobs(@Req() req: Express.Request): Promise<Job[]> {
-    const result = this.companiesService.getJobs(req.user.user_id);
+  getJobsByCompany(@Req() req: Express.Request): Promise<Job[]> {
+    const result = this.companiesService.getOwnPublishedJobs(req.user.user_id);
     return result;
   }
+
+  @ApiTags('companies')
+  @ApiOperation({ summary: 'add student to request' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'true if job modified successfully',
+    type: Boolean,
+    isArray: true,
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 406, description: 'Not Possible' })
+  @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiBearerAuth('access-token')
+  @Post('job/accept/:studentId/:jobId')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Company)
+  @SerializeOptions({
+    excludePrefixes: ['_'],
+  })
+  addStudentsRequestToRequests(
+    @Req() req: Express.Request,
+    @Param('studentId') studentId: string,
+    @Param('jobId') jobId: string,
+  ): Promise<boolean> {
+    const result = this.companiesService.acceptStudentRequest(
+      req.user,
+      jobId,
+      studentId,
+    );
+    return result;
+  }
+
+  ////////////////////tests
 
   @Post('testmail')
   sendTestMail(): void {
     this.companiesService.sendTestMail().catch((err) => {
       throw err;
     });
+  }
+
+  @ApiBearerAuth('access-token')
+  @Post('jobtest')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Company)
+  createTestJob(
+    @Req() req: Express.Request,
+    @Body() updateData: CreateJobDto,
+  ): Promise<Job> {
+    const result = this.companiesService.createJob(req.user, updateData);
+    return result;
   }
 }

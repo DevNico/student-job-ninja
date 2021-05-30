@@ -12,11 +12,18 @@ import { Address } from 'src/common/models/address.model';
 export class CompanyDto {
   @IsNotEmpty()
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
   @IsString()
   @IsNotEmpty()
   @Length(1, 500)
   company_info: string;
+
   @IsOptional()
+  @IsString()
   homepage?: string;
 
   @ApiProperty({

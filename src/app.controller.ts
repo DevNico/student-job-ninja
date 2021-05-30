@@ -1,8 +1,8 @@
 import {
   CacheTTL,
   Controller,
+  ForbiddenException,
   Get,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   Req,
@@ -22,7 +22,7 @@ import { RolesGuard } from './common/auth/roles.guard';
 import { Roles } from './common/decorators/roles.decorator';
 import { Collections } from './common/enums/colletions.enum';
 import { Role } from './common/enums/roles.enum';
-import { SignInResponse } from './common/models/sign-in-response.model';
+import { UserResponse } from './common/models/sign-in-response.model';
 import { Company } from './modules/companies/entities/company.entity';
 import { Student } from './modules/students/entities/student.entity';
 import { SharedDataAccessService } from './shared-data-access.service';
@@ -37,7 +37,7 @@ export class AppController {
   @ApiOkResponse({
     status: 200,
     description: 'got the current user data.',
-    type: SignInResponse,
+    type: UserResponse,
   })
   @ApiResponse({
     status: 403,
@@ -46,34 +46,39 @@ export class AppController {
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Company, Role.Student)
-  @CacheTTL(20) //TODO: TESTING
+  @CacheTTL(20)
   @Get('user/me')
-  async signin(@Req() req: Express.Request): Promise<SignInResponse> {
+  async getOwnProfile(@Req() req: Express.Request): Promise<UserResponse> {
     const roles = req.user.roles;
+    //TODO refactor #5
     if (roles.includes(Role.Student)) {
-      return this.sharedDataAccessService
-        .getUserById<Student>(req.user.user_id, Collections.Students)
-        .catch((err) => {
-          throw err;
-        })
-        .then((result) => {
-          if (result)
-            return <SignInResponse>{ userType: 'student', userData: result };
-          throw new InternalServerErrorException();
-        });
+      const profile = await this.sharedDataAccessService.getUserById<Student>(
+        req.user.uid,
+        Collections.Students,
+      );
+      const jobs = await this.sharedDataAccessService
+        .findStudentAssignedJobs(req.user.uid)
+        .catch(() => []);
+      return <UserResponse>{
+        userType: 'student',
+        userData: profile,
+        assignedJobs: jobs,
+      };
     } else if (roles.includes(Role.Company)) {
-      return this.sharedDataAccessService
-        .getUserById<Company>(req.user.user_id, Collections.Companies)
-        .catch((err) => {
-          return err;
-        })
-        .then((company) => {
-          if (company) {
-            return <SignInResponse>{ userType: 'company', userData: company };
-          }
-          throw new InternalServerErrorException();
-        });
+      const profile = await this.sharedDataAccessService.getUserById<Company>(
+        req.user.uid,
+        Collections.Companies,
+      );
+      const CompanysJobs = await this.sharedDataAccessService.findCompanyAssignedJobs(
+        req.user.uid,
+      );
+      return <UserResponse>{
+        userType: 'company',
+        userData: profile,
+        assignedJobs: CompanysJobs,
+      };
     }
+    throw new ForbiddenException();
   }
 
   @ApiTags('global')
@@ -94,34 +99,54 @@ export class AppController {
   @SerializeOptions({
     excludePrefixes: ['_'],
   })
-  async getUserById(
-    @Param('uid') uid: string,
-  ): Promise<Student | Company | any> {
-    let collection = Collections.Companies;
-    let roles: Role[];
-    await this.sharedDataAccessService
+  async getUserById(@Param('uid') uid: string): Promise<UserResponse> {
+    const roles = await this.sharedDataAccessService
       .getUserFromAuthStore(uid)
       .then((result) => {
         if (!result || !result.roles) throw new NotFoundException();
-        roles = result.roles;
+        return result.roles;
       })
       .catch((err) => {
         throw err;
       });
 
+    //TODO refactor #5
     if (roles && roles.includes(Role.Student)) {
-      console.log('roles after if', roles);
-      collection = Collections.Students;
+      const profile = await this.sharedDataAccessService.getUserById<Student>(
+        uid,
+        Collections.Students,
+      );
+      const jobHistory = await this.sharedDataAccessService
+        .findStudentAssignedJobs(uid)
+        .catch(() => []);
+      return <UserResponse>{
+        userType: 'student',
+        userData: profile,
+        assignedJobs: jobHistory,
+      };
+    } else if (roles.includes(Role.Company)) {
+      const profile = await this.sharedDataAccessService.getUserById<Company>(
+        uid,
+        Collections.Companies,
+      );
+      const CompanysJobs = await this.sharedDataAccessService.findCompanyAssignedJobs(
+        uid,
+      );
+      return <UserResponse>{
+        userType: 'company',
+        userData: profile,
+        assignedJobs: CompanysJobs,
+      };
     }
-
-    const result = this.sharedDataAccessService.getUserById(uid, collection);
-    return result;
+    throw new NotFoundException();
   }
 
+  @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Company, Role.Student)
-  @Get('user/test')
+  @Get('user/test/u')
   async test(@Req() req: Express.Request): Promise<AuthUser> {
+    console.log('testing');
     const user = req.user;
     return user;
   }

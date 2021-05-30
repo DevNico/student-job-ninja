@@ -38,3 +38,4 @@ lerna-debug.log*
 
 #firbase credentials
 firebase-admin-credentials.json
+local-db/mock_data
