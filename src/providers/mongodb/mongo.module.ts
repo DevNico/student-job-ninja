@@ -1,6 +1,7 @@
 import { Global, Logger } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 import { MongoClient, Db } from 'mongodb';
+import { Collections } from 'src/common/enums/colletions.enum';
 ///Module for async initialisation of the mongodb connection
 ///Can be injected by the provider name
 @Global()
@@ -23,6 +24,15 @@ import { MongoClient, Db } from 'mongodb';
           await db
             .collection('init_collection')
             .createIndex({ id: 1 }, { unique: true, sparse: true });
+          await db
+            .collection(Collections.Students)
+            .createIndex({ id: 1 }, { unique: true, sparse: true });
+          await db
+            .collection(Collections.Companies)
+            .createIndex({ id: 1 }, { unique: true, sparse: true });
+          await db
+            .collection(Collections.jobs)
+            .createIndex({ jobName: 'text', jobDescription: 'text' });
           return db;
         } catch (e) {
           throw e;

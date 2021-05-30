@@ -4,7 +4,6 @@ import {
   InternalServerErrorException,
   NotAcceptableException,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { Db } from 'mongodb';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
@@ -70,27 +69,32 @@ export class CompaniesService {
   async createJob(user: AuthUser, jobData: CreateJobDto): Promise<Job> {
     const id: string = uuid();
     const job = new Job(id, jobData);
+    console.log('createJob');
     Object.assign(job, {
       publisher_id: user.uid,
+      active: true,
+      final_accepted_id: '',
     });
     return this.mongodb
       .collection('jobs')
       .insertOne(job)
+      .then((result) => {
+        console.log('inserted: ' + result.insertedCount);
+        if (result.insertedCount > 0) {
+          return this.jobProcessorQueue.add('match', job, {});
+        }
+      })
+      .then((result) => console.log(result))
+      .then(() => job)
       .catch((err) => {
         console.log(err);
         throw new InternalServerErrorException();
-      })
-      .then((result) => {
-        if (result.insertedCount > 0) {
-          return job;
-        }
-        throw new UnprocessableEntityException();
       });
   }
 
-  async getJobs(userId: string): Promise<Job[]> {
+  async getOwnPublishedJobs(userId: string): Promise<Job[]> {
     return this.mongodb
-      .collection('jobs')
+      .collection(Collections.jobs)
       .find({ publisher_id: userId })
       .toArray()
       .catch((err) => {
@@ -102,6 +106,35 @@ export class CompaniesService {
           return result;
         }
         throw new NotFoundException();
+      });
+  }
+
+  async acceptStudentRequest(
+    //TODO send job request email
+    user: AuthUser,
+    jobId: string,
+    studentId: string,
+  ): Promise<boolean> {
+    console.log(
+      'jobid:' +
+        jobId +
+        ' studentId:' +
+        studentId +
+        ' publisher: ' +
+        user.user_id,
+    );
+    return this.mongodb
+      .collection(Collections.jobs)
+      .updateOne(
+        {
+          _id: jobId,
+          publisher_id: user.uid,
+        },
+        { $addToSet: { requested_ids: studentId } },
+      )
+      .then((result) => {
+        console.log(result.matchedCount);
+        return result.modifiedCount > 0;
       });
   }
 

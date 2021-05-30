@@ -16,15 +16,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         ttl: 5,
       }),
     }),
-    //register Cache Module gloablly with default key ttl of 5 seconds
-    /*
-      CacheModule.register({
-      ttl: 5,
-      //store: redisStore,
-      //host: process.env.REDIS_HOST,
-      //port: parseInt(process.env.REDIS_PORT, 10),
-    }),
-    */
   ],
   providers: [
     {

@@ -7,6 +7,7 @@ export class Company extends Entity {
   _id: string;
   //not bound to firebase email
   email: string;
+  name: string;
   company_info: string;
   homepage: string;
   image_url: string;
