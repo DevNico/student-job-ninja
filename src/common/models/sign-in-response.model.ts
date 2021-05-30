@@ -17,5 +17,12 @@ export class UserResponse {
   })
   userData: Student | Company;
 
+  @ApiProperty({
+    description: 'Jobs with company or only jobs (userType Company)',
+    oneOf: [
+      { $ref: getSchemaPath(Job) },
+      { $ref: getSchemaPath(JobWithCompany) },
+    ],
+  })
   assignedJobs: Job[] | JobWithCompany[];
 }

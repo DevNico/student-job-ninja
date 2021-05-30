@@ -1,9 +1,4 @@
-import {
-  CACHE_MANAGER,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Db } from 'mongodb';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { Company } from '../companies/entities/company.entity';

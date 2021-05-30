@@ -80,10 +80,6 @@ export class StudentDto {
   @ArrayMaxSize(15)
   languages: string[];
 
-  @IsArray()
-  @IsString({ each: true })
-  datesAvailable: string[];
-
   @IsNotEmpty()
   @Type(() => Date)
   @IsDate()

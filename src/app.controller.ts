@@ -3,8 +3,6 @@ import {
   Controller,
   ForbiddenException,
   Get,
-  Inject,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   Req,
@@ -18,7 +16,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Db } from 'mongodb';
 import { AuthUser } from './common/auth/auth-user.model';
 import { FirebaseAuthGuard } from './common/auth/firebase-auth.guard';
 import { RolesGuard } from './common/auth/roles.guard';
@@ -27,7 +24,6 @@ import { Collections } from './common/enums/colletions.enum';
 import { Role } from './common/enums/roles.enum';
 import { UserResponse } from './common/models/sign-in-response.model';
 import { Company } from './modules/companies/entities/company.entity';
-import { Job } from './modules/companies/entities/job.entity';
 import { Student } from './modules/students/entities/student.entity';
 import { SharedDataAccessService } from './shared-data-access.service';
 
@@ -145,10 +141,12 @@ export class AppController {
     throw new NotFoundException();
   }
 
+  @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Company, Role.Student)
-  @Get('user/test')
+  @Get('user/test/u')
   async test(@Req() req: Express.Request): Promise<AuthUser> {
+    console.log('testing');
     const user = req.user;
     return user;
   }

@@ -14,13 +14,14 @@ export class JobWithCompany implements Job {
   languages: string[];
   from: Date;
   to: Date;
+  requested_by_students: string[];
   requested_ids: string[];
-  final_accepted_id: string[];
+  final_accepted_id: string;
   publisher: Company;
   active: boolean;
 
-  constructor(partialJob: Partial<Job>, partialCompany: Partial<Company>) {
+  constructor(partialJob: Partial<Job>, company: Company) {
     Object.assign(this, partialJob);
-    Object.assign(this.publisher, partialCompany);
+    this.publisher = company;
   }
 }

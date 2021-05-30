@@ -4,7 +4,6 @@ import {
   InternalServerErrorException,
   NotAcceptableException,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { Db } from 'mongodb';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
@@ -74,6 +73,7 @@ export class CompaniesService {
     Object.assign(job, {
       publisher_id: user.uid,
       active: true,
+      final_accepted_id: '',
     });
     return this.mongodb
       .collection('jobs')
@@ -106,6 +106,35 @@ export class CompaniesService {
           return result;
         }
         throw new NotFoundException();
+      });
+  }
+
+  async acceptStudentRequest(
+    //TODO send job request email
+    user: AuthUser,
+    jobId: string,
+    studentId: string,
+  ): Promise<boolean> {
+    console.log(
+      'jobid:' +
+        jobId +
+        ' studentId:' +
+        studentId +
+        ' publisher: ' +
+        user.user_id,
+    );
+    return this.mongodb
+      .collection(Collections.jobs)
+      .updateOne(
+        {
+          _id: jobId,
+          publisher_id: user.uid,
+        },
+        { $addToSet: { requested_ids: studentId } },
+      )
+      .then((result) => {
+        console.log(result.matchedCount);
+        return result.modifiedCount > 0;
       });
   }
 

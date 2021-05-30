@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
+  Post,
   SerializeOptions,
 } from '@nestjs/common';
 import {
@@ -36,17 +37,20 @@ export class JobsController {
   @SerializeOptions({
     excludePrefixes: ['_'],
   })
-  async getJobById(@Param('id') jobId: string): Promise<Job> {
+  async getJobById(@Param('id') jobId: string): Promise<JobWithCompany> {
     const resultJobMerged = await this.jobsService
       .getJobById(jobId)
       .then(async (resultJob) => {
         const resultCompany = await this.jobsService.getCompanyById(
           resultJob.publisher_id,
         );
+        console.log(resultCompany);
+        console.log(resultJob);
         return new JobWithCompany(resultJob, resultCompany);
       })
       .catch((err) => {
         if (err.code === 404) throw new NotFoundException();
+        console.log(err);
         throw new InternalServerErrorException();
       });
     return resultJobMerged;
@@ -61,11 +65,11 @@ export class JobsController {
   })
   @ApiResponse({ status: 404, description: 'No Jobs found' })
   @ApiResponse({ status: 500, description: 'Internal error.' })
-  @Get()
+  @Post()
   @SerializeOptions({
     excludePrefixes: ['_'],
   })
-  async getJobsById(@Body() jobIds: string[]): Promise<Job[]> {
+  async getJobsById(@Body() jobIds: string[]): Promise<JobWithCompany[]> {
     const resultJobsMerged = await this.jobsService
       .getJobsByIds(jobIds)
       .then((resultJobs) => {
@@ -90,20 +94,23 @@ export class JobsController {
   @ApiResponse({ status: 404, description: 'No Jobs found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 500, description: 'Internal error.' })
-  @Get()
+  @Post('/search')
   @SerializeOptions({
     excludePrefixes: ['_'],
   })
-  async searchJobs(@Body() searchQuery: SearchJobDto): Promise<Job[]> {
+  async searchJobs(
+    @Body() searchQuery: SearchJobDto,
+  ): Promise<JobWithCompany[]> {
     return this.jobsService
       .searchJobs(searchQuery)
+      .catch((error) => {
+        console.log(error);
+        if (error.code === 404) throw new NotFoundException();
+        throw new InternalServerErrorException();
+      })
       .then((result) => {
         if (result && result.length > 0) return result;
         throw new NotFoundException();
-      })
-      .catch((error) => {
-        console.log(error);
-        throw new InternalServerErrorException();
       });
   }
 }

@@ -9,6 +9,7 @@ import { Cache } from 'cache-manager';
 import { Db } from 'mongodb';
 import { AuthUser } from 'src/common/auth/auth-user.model';
 import { Collections } from 'src/common/enums/colletions.enum';
+import { JobWithCompany } from 'src/modules/jobs/models/job-with-company.model';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { MailService } from '../../mail/mail.service';
 import { StudentDto } from '../dtos/create-student.dto';
@@ -62,5 +63,70 @@ export class StudentsService {
       .catch((err) => {
         throw err;
       });
+  }
+
+  async acceptJob(user: AuthUser, jobId: string): Promise<boolean> {
+    //TODO: send contact mail
+    return this.mongodb
+      .collection(Collections.jobs)
+      .updateOne(
+        { _id: jobId, final_accepted_id: '', active: true },
+        { $set: { final_accepted_id: user.uid, active: false } },
+      )
+      .then((result) => {
+        return result.modifiedCount > 0;
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException();
+      });
+  }
+
+  async requestJob(user: AuthUser, jobId: string): Promise<boolean> {
+    //TODO: send new request mail to company
+    return this.mongodb
+      .collection(Collections.jobs)
+      .updateOne(
+        { _id: jobId, final_accepted_id: '', active: true },
+        { $addToSet: { requested_by_students: user.uid } },
+      )
+      .then((result) => {
+        return result.modifiedCount > 0;
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException();
+      });
+  }
+
+  async getAllJobRequests(user: AuthUser): Promise<JobWithCompany[]> {
+    return this.mongodb
+      .collection(Collections.jobs)
+      .aggregate(
+        [
+          {
+            $match: {
+              requested_ids: user.uid,
+            },
+          },
+          {
+            $lookup: {
+              from: 'companies',
+              localField: 'publisher_id',
+              foreignField: '_id',
+              as: 'publisher',
+            },
+          },
+          {
+            $addFields: {
+              publisher: {
+                $arrayElemAt: ['$publisher', 0],
+              },
+            },
+          },
+        ],
+        { allowDiskUse: true },
+      )
+      .toArray();
   }
 }

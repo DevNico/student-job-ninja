@@ -92,8 +92,8 @@ export class SharedDataAccessService {
         throw new InternalServerErrorException();
       })
       .then((result) => {
-        if (result) {
-          return result as T;
+        if (result && result.value) {
+          return result.value as T;
         }
         throw new UnprocessableEntityException();
       });

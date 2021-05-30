@@ -96,6 +96,8 @@ export class JobProcessor {
       matchingLimit,
     );
     if (matches.length > 0) {
+      const matchedIds = matches.map((match) => match._id);
+      await this.applyRequestsToJob(job.data, matchedIds);
       const sentMails = await this.sendMailToMatches(
         matches,
         job.data,
@@ -195,7 +197,7 @@ export class JobProcessor {
           {
             $match: {
               fromAvailable: {
-                $gte: new Date(job.from),
+                $lte: new Date(job.from),
               },
               toAvailable: {
                 $gte: new Date(job.to),
@@ -252,5 +254,15 @@ export class JobProcessor {
         { allowDiskUse: true },
       )
       .toArray();
+  }
+
+  async applyRequestsToJob(job: Job, requestIds: string[]): Promise<number> {
+    const updatedJob = await this.mongodb
+      .collection(Collections.jobs)
+      .updateOne(
+        { _id: job._id },
+        { $addToSet: { requested_ids: requestIds } },
+      );
+    return updatedJob.modifiedCount;
   }
 }

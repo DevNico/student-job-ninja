@@ -15,8 +15,9 @@ export class Job extends Entity {
   from: Date;
   to: Date;
   active: boolean;
+  requested_by_students: string[];
   requested_ids: string[];
-  final_accepted_id: string[];
+  final_accepted_id = '';
 
   constructor(id, partial: Partial<Job>) {
     super(id);

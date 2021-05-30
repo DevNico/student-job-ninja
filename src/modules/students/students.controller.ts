@@ -2,6 +2,10 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
+  InternalServerErrorException,
+  NotAcceptableException,
+  Param,
   Post,
   Put,
   Req,
@@ -20,6 +24,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { Role } from 'src/common/enums/roles.enum';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
+import { JobWithCompany } from '../jobs/models/job-with-company.model';
 import { StudentDto } from './dtos/create-student.dto';
 import { UpdateStudentDto } from './dtos/update-student.dto';
 import { Student } from './entities/student.entity';
@@ -99,5 +104,74 @@ export class StudentsController {
   @Delete()
   delete(@Req() req: Express.Request): Promise<void> {
     return this.studentsService.delete(req.user);
+  }
+
+  @ApiTags('students')
+  @ApiOperation({ summary: 'get all requested jobs' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'list of jobs with company',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Student)
+  @Get('/requests')
+  getRequests(@Req() req: Express.Request): Promise<JobWithCompany[]> {
+    return this.studentsService
+      .getAllJobRequests(req.user)
+      .then((result) => {
+        console.log('result');
+        console.log(result);
+        if (result.length > 0) return result;
+        return [];
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException();
+      });
+  }
+
+  @ApiTags('students')
+  @ApiOperation({ summary: 'accept job' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'Job accepted',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 406, description: 'Already accepted by someone else' })
+  @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Student)
+  @Post('/accept/:jobId')
+  async acceptJob(
+    @Req() req: Express.Request,
+    @Param('jobId') jobId: string,
+  ): Promise<void> {
+    const result = await this.studentsService.acceptJob(req.user, jobId);
+    if (!result) throw new NotAcceptableException();
+  }
+
+  @ApiTags('students')
+  @ApiOperation({ summary: 'request job' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'Job request send successfully',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 406, description: 'Not Possible (Job inactive)' })
+  @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Student)
+  @Post('/request/:jobId')
+  async requestJob(
+    @Req() req: Express.Request,
+    @Param('jobId') jobId: string,
+  ): Promise<void> {
+    const result = await this.studentsService.requestJob(req.user, jobId);
+    if (!result) throw new NotAcceptableException();
   }
 }
