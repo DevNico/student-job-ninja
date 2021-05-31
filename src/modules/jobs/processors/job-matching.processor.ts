@@ -82,7 +82,10 @@ export class JobProcessor {
       this.logger.log(`Job outdated: '${JSON.stringify(job.data)}'`);
       return 0;
     }
-    if (!job.data.active) {
+    const jobFromDb = await this.mongodb
+      .collection(Collections.jobs)
+      .findOne({ _id: job.data._id });
+    if (!jobFromDb.active) {
       return 0;
     }
     const minSkillsRequired = 1;
@@ -105,7 +108,6 @@ export class JobProcessor {
       );
       return sentMails;
     } else {
-      //FIXME: test
       console.log('no match found send to second queue');
       await this.jobProcessorQueue
         .add('match', job, {
