@@ -113,7 +113,7 @@ export class CompaniesController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
-  @ApiResponse({ status: 422, description: 'Unprocessable entity' })
+  @ApiResponse({ status: 422, description: 'Unprocurable entity' })
   @ApiBearerAuth('access-token')
   @Post('job')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
