@@ -2,6 +2,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
@@ -29,11 +30,9 @@ export class CompaniesService {
     private readonly mailService: MailService,
     private sharedDataAccessService: SharedDataAccessService,
   ) {}
+  private readonly logger = new Logger(CompaniesService.name);
 
-  async createCompany(
-    company: CompanyDto,
-    user: AuthUser,
-  ): Promise<Company | any> {
+  async createCompany(company: CompanyDto, user: AuthUser): Promise<Company> {
     //build entity object (assign id and email from properties from firebase
     const companyEntity = new Company(user.uid, company);
 
@@ -47,7 +46,7 @@ export class CompaniesService {
         }
       })
       .catch((err) => {
-        console.error(err);
+        this.logger.error(err);
         if (err.code === 11000) throw new NotAcceptableException();
         throw new InternalServerErrorException();
       });
@@ -62,6 +61,7 @@ export class CompaniesService {
     await this.sharedDataAccessService
       .deleteProfile(user, Collections.Companies)
       .catch((err) => {
+        this.logger.error(err);
         throw err;
       });
   }
@@ -69,7 +69,6 @@ export class CompaniesService {
   async createJob(user: AuthUser, jobData: CreateJobDto): Promise<Job> {
     const id: string = uuid();
     const job = new Job(id, jobData);
-    console.log('createJob');
     Object.assign(job, {
       publisher_id: user.uid,
       active: true,
@@ -79,15 +78,16 @@ export class CompaniesService {
       .collection('jobs')
       .insertOne(job)
       .then((result) => {
-        console.log('inserted: ' + result.insertedCount);
         if (result.insertedCount > 0) {
+          this.logger.log(
+            ` insert job (${result.insertedId}) to matching queue`,
+          );
           return this.jobProcessorQueue.add('match', job, {});
         }
       })
-      .then((result) => console.log(result))
       .then(() => job)
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
   }
@@ -98,7 +98,7 @@ export class CompaniesService {
       .find({ publisher_id: userId })
       .toArray()
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       })
       .then((result) => {
@@ -115,14 +115,6 @@ export class CompaniesService {
     jobId: string,
     studentId: string,
   ): Promise<boolean> {
-    console.log(
-      'jobid:' +
-        jobId +
-        ' studentId:' +
-        studentId +
-        ' publisher: ' +
-        user.user_id,
-    );
     return this.mongodb
       .collection(Collections.jobs)
       .updateOne(
@@ -133,7 +125,9 @@ export class CompaniesService {
         { $addToSet: { requested_ids: studentId } },
       )
       .then((result) => {
-        console.log(result.matchedCount);
+        this.logger.log(
+          `Student accepted job request. Modified: ${result.matchedCount} `,
+        );
         return result.modifiedCount > 0;
       });
   }

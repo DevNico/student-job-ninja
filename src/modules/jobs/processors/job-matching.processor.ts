@@ -73,11 +73,11 @@ export class JobProcessor {
   async matchJob(job: BullJob<Job>): Promise<number> {
     this.logger.log(`match job: '${JSON.stringify(job.data)}'`);
     const now = new Date(Date.now());
-    //todo replace with active field
+    const jobDate = new Date(job.data.from);
     if (
-      job.data.from.getFullYear == now.getFullYear &&
-      job.data.from.getMonth == now.getMonth &&
-      job.data.from.getDay == now.getDay
+      jobDate.getFullYear() == now.getFullYear() &&
+      jobDate.getMonth() == now.getMonth() &&
+      jobDate.getDay() == now.getDay()
     ) {
       this.logger.log(`Job outdated: '${JSON.stringify(job.data)}'`);
       return 0;
@@ -108,7 +108,7 @@ export class JobProcessor {
       );
       return sentMails;
     } else {
-      console.log('no match found send to second queue');
+      this.logger.log('no match found send to second queue');
       await this.jobProcessorQueue
         .add('match', job, {
           delay: 86400000,

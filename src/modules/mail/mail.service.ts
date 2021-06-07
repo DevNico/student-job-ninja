@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { MailData } from './interfaces/mail-data.interface';
 import { Db, InsertOneWriteOpResult } from 'mongodb';
@@ -17,6 +18,7 @@ export class MailService {
     private mongodb: Db,
     private mailerService: MailerService,
   ) {}
+  private readonly logger = new Logger(MailService.name);
 
   //send a job offer to student and replace template text with handlebars (context)
   async sendJobOffer(
@@ -32,7 +34,7 @@ export class MailService {
       'example.hbs',
     );
     if (!fs.existsSync(path)) {
-      console.log('PATH not available: ', path);
+      this.logger.error('PATH not available: ', path);
       throw new InternalServerErrorException();
     }
     return this.mailerService
@@ -58,7 +60,7 @@ export class MailService {
           .collection('mails')
           .insertOne(mailEntity)
           .catch((err) => {
-            console.log(err);
+            this.logger.error(err);
             throw new InternalServerErrorException();
           });
       });

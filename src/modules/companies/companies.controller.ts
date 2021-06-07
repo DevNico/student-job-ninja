@@ -58,7 +58,6 @@ export class CompaniesController {
       email: companyData.email,
       roles: [Role.Company],
     });
-    console.log('log center');
     const result = this.companiesService.createCompany(companyData, req.user);
     return result;
   }
@@ -75,9 +74,8 @@ export class CompaniesController {
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Company)
   @Delete()
-  delete(@Req() req: Express.Request): any {
-    const result = this.companiesService.delete(req.user);
-    return result;
+  async delete(@Req() req: Express.Request): Promise<void> {
+    await this.companiesService.delete(req.user);
   }
 
   @ApiTags('companies')

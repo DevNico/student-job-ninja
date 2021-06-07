@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  Logger,
   NotAcceptableException,
   Param,
   Post,
@@ -36,6 +37,7 @@ export class StudentsController {
     private studentsService: StudentsService,
     private readonly sharedDataAccessService: SharedDataAccessService,
   ) {}
+  private readonly logger = new Logger(StudentsController.name);
 
   //apply auth to signup endpoint
   @ApiTags('auth')
@@ -122,13 +124,11 @@ export class StudentsController {
     return this.studentsService
       .getAllJobRequests(req.user)
       .then((result) => {
-        console.log('result');
-        console.log(result);
         if (result.length > 0) return result;
         return [];
       })
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
   }

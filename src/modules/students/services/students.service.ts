@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotAcceptableException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
@@ -26,10 +27,11 @@ export class StudentsService {
     private readonly mailService: MailService,
     private sharedDataAccessService: SharedDataAccessService,
   ) {}
+  private readonly logger = new Logger(StudentsService.name);
 
   async createStudent(
     student: StudentDto,
-    _firebaseUser: any,
+    _firebaseUser: AuthUser,
   ): Promise<Student> {
     //create the entity object and assign additional properties from firebase auth token
     const studentEntity = new Student(_firebaseUser.user_id, student);
@@ -77,7 +79,7 @@ export class StudentsService {
         return result.modifiedCount > 0;
       })
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
   }
@@ -94,7 +96,7 @@ export class StudentsService {
         return result.modifiedCount > 0;
       })
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
   }

@@ -4,6 +4,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as admin from 'firebase-admin';
@@ -20,6 +21,7 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, 'firebase') {
   ) {
     super();
   }
+  private readonly logger = new Logger(FirebaseStrategy.name);
 
   //call verify every time an endpoint is marked with @useGuard(AuthGuard)
   async validate(req: Request): Promise<AuthUser> {
@@ -72,7 +74,7 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, 'firebase') {
       })
       .catch((err) => {
         if (err.code === 404) return [];
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
   }
