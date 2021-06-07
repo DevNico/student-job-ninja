@@ -6,7 +6,7 @@ import {
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
-import { Db } from 'mongodb';
+import { Db, InsertOneWriteOpResult } from 'mongodb';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { MailService } from '../mail/mail.service';
 import { CompanyDto } from './dtos/company.dto';
@@ -20,6 +20,7 @@ import { JobRequestMailData } from '../mail/interfaces/mail-data.interface';
 import { AuthUser } from 'src/common/auth/auth-user.model';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { Student } from '../students/entities/student.entity';
 
 @Injectable()
 export class CompaniesService {
@@ -124,14 +125,58 @@ export class CompaniesService {
         },
         { $addToSet: { requested_ids: studentId } },
       )
-      .then((result) => {
+      .then(async (result) => {
         this.logger.log(
           `Student accepted job request. Modified: ${result.matchedCount} `,
+        );
+        await this.sendJobRequestMail(user.uid, jobId, studentId).catch(
+          (err) => {
+            this.logger.error(err);
+            throw new InternalServerErrorException();
+          },
         );
         return result.modifiedCount > 0;
       });
   }
 
+  async sendJobRequestMail(
+    companyId: string,
+    jobId: string,
+    studentId: string,
+  ): Promise<InsertOneWriteOpResult<MailEntity>> {
+    try {
+      const company: Company = await this.mongodb
+        .collection(Collections.Companies)
+        .findOne({ _id: companyId });
+      const job: Job = await this.mongodb
+        .collection(Collections.jobs)
+        .findOne({ _id: jobId });
+      const student: Student = await this.mongodb
+        .collection(Collections.Students)
+        .findOne({ _id: studentId });
+      return this.mailService.sendJobOffer(
+        <JobRequestMailData>{
+          to: student.email,
+          studentName: `${student.firstName} ${student.lastName}`,
+          url: 'http://google.com', //TODO
+          companyName: company.name,
+          jobName: job.jobName,
+          fromDate: job.from.toDateString(),
+          toDate: job.to.toDateString(),
+          jobDescription: job.jobDescription,
+        },
+        new MailEntity({
+          companyId: companyId,
+          jobId: jobId,
+          studentId: studentId,
+        }),
+      );
+    } catch (err) {
+      this.logger.error(err);
+    }
+  }
+
+  //TODO remove
   async sendTestMail(): Promise<any> {
     const result = await this.mailService.sendJobOffer(
       <JobRequestMailData>{
