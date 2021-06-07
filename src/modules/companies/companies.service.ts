@@ -16,7 +16,7 @@ import { Job } from './entities/job.entity';
 import { v4 as uuid } from 'uuid';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { MailEntity } from '../mail/entities/mail.entity';
-import { MailData } from '../mail/interfaces/mail-data.interface';
+import { JobRequestMailData } from '../mail/interfaces/mail-data.interface';
 import { AuthUser } from 'src/common/auth/auth-user.model';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
@@ -134,16 +134,20 @@ export class CompaniesService {
 
   async sendTestMail(): Promise<any> {
     const result = await this.mailService.sendJobOffer(
-      <MailData>{
-        to: 'test@gmail.com',
-        title: 'testanfrage',
+      <JobRequestMailData>{
+        to: 'kev.ed.simon@gmail.com',
+        studentName: ' Kevin Eder',
         url: 'http://google.com',
-        text1: 'text1 template',
-        text2: 'text2 template',
+        companyName: 'Firma GmBH',
+        jobName: 'Full stack entwickler',
+        fromDate: '12-05-2021',
+        toDate: '12-06-2021',
+        jobDescription:
+          'ich bin ein beispiel job der nur zu testzwecken erstellt wurde',
       },
       new MailEntity({
         companyId: '1234company',
-        jobId: '1234jobid',
+        jobId: uuid(),
         studentId: '1234studentid',
       }),
     );

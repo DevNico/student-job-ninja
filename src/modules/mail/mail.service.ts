@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { MailData } from './interfaces/mail-data.interface';
+import { JobRequestMailData } from './interfaces/mail-data.interface';
 import { Db, InsertOneWriteOpResult } from 'mongodb';
 import { MailEntity } from './entities/mail.entity';
 import { join } from 'path';
@@ -22,7 +22,7 @@ export class MailService {
 
   //send a job offer to student and replace template text with handlebars (context)
   async sendJobOffer(
-    mailData: MailData,
+    mailData: JobRequestMailData,
     mailEntity: MailEntity,
   ): Promise<InsertOneWriteOpResult<any>> {
     const path = join(
@@ -31,7 +31,7 @@ export class MailService {
       'modules',
       'mail',
       'mail-templates',
-      'example.hbs',
+      'job-request.hbs',
     );
     if (!fs.existsSync(path)) {
       this.logger.error('PATH not available: ', path);
@@ -40,16 +40,17 @@ export class MailService {
     return this.mailerService
       .sendMail({
         to: mailData.to,
-        subject: 'subject',
+        subject: 'Neue Jobanfrage!',
         text: `text`,
         template: path,
         context: {
-          title: mailData.title,
+          studentName: mailData.studentName,
           url: mailData.url,
-          actionTitle: 'Anfrage akzeptieren',
-          app_name: 'Studentenjobbörse',
-          text1: mailData.text1,
-          text2: mailData.text2,
+          companyName: mailData.companyName,
+          jobName: mailData.jobName,
+          jobDescription: mailData.jobDescription,
+          fromDate: mailData.fromDate,
+          toDate: mailData.toDate,
         },
       })
       .catch((err) => {

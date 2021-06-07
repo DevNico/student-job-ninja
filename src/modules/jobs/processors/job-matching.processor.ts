@@ -11,7 +11,7 @@ import { Job as BullJob, Queue } from 'bull';
 import { Db, InsertOneWriteOpResult } from 'mongodb';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { MailEntity } from 'src/modules/mail/entities/mail.entity';
-import { MailData } from 'src/modules/mail/interfaces/mail-data.interface';
+import { JobRequestMailData } from 'src/modules/mail/interfaces/mail-data.interface';
 import { MailService } from 'src/modules/mail/mail.service';
 import { StudentMatch } from 'src/modules/students/models/student-match.model';
 import { Company } from '../../companies/entities/company.entity';
@@ -149,16 +149,17 @@ export class JobProcessor {
     student: StudentMatch,
     company: Company,
   ): Promise<InsertOneWriteOpResult<MailEntity>> {
-    //TODO: update email template and text
     //TODO: REMOVE MOCK
     return <InsertOneWriteOpResult<MailEntity>>{ insertedCount: 1 };
     const result = await this.mailService.sendJobOffer(
-      <MailData>{
+      <JobRequestMailData>{
         to: student.email,
-        title: `New Job request from ${company.name}`,
-        url: 'http://google.com',
-        text1: 'text1 template',
-        text2: 'text2 template',
+        companyName: company.name,
+        url: 'http://google.com', //TODO
+        jobName: job.jobName,
+        jobDescription: job.jobDescription,
+        fromDate: job.from.toDateString(),
+        toDate: job.to.toDateString(),
       },
       new MailEntity({
         companyId: job.publisher_id,
