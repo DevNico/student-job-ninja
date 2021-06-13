@@ -22,6 +22,12 @@ import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
 import { Student } from '../students/entities/student.entity';
 
+/**
+ * Service for handling actions triggered by a company account
+ *
+ * @export
+ * @class CompaniesService
+ */
 @Injectable()
 export class CompaniesService {
   constructor(
@@ -33,6 +39,14 @@ export class CompaniesService {
   ) {}
   private readonly logger = new Logger(CompaniesService.name);
 
+  /**
+   * Create a new company profile and store it to MongoDB
+   *
+   * @param {CompanyDto} company Company to create
+   * @param {AuthUser} user Firebase Auth user data
+   * @return {*}  {Promise<Company>} created company
+   * @memberof CompaniesService
+   */
   async createCompany(company: CompanyDto, user: AuthUser): Promise<Company> {
     //build entity object (assign id and email from properties from firebase
     const companyEntity = new Company(user.uid, company);
@@ -53,6 +67,13 @@ export class CompaniesService {
       });
   }
 
+  /**
+   * Delete company's profile and disable jobs
+   *
+   * @param {AuthUser} user Firebase Auth user
+   * @return {*}  {Promise<void>}
+   * @memberof CompaniesService
+   */
   async delete(user: AuthUser): Promise<void> {
     //TODO: check for unfinished but requested jobs -> reject
 
@@ -67,6 +88,14 @@ export class CompaniesService {
       });
   }
 
+  /**
+   * Create a new Job and add it to matching queue
+   *
+   * @param {AuthUser} user Firebase Auth user
+   * @param {CreateJobDto} jobData Job to create
+   * @return {*}  {Promise<Job>} created Job
+   * @memberof CompaniesService
+   */
   async createJob(user: AuthUser, jobData: CreateJobDto): Promise<Job> {
     const id: string = uuid();
     const job = new Job(id, jobData);
@@ -93,6 +122,13 @@ export class CompaniesService {
       });
   }
 
+  /**
+   * get all jobs created by user's id
+   *
+   * @param {string} userId id to search for
+   * @return {*}  {Promise<Job[]>} list of matched jobs
+   * @memberof CompaniesService
+   */
   async getOwnPublishedJobs(userId: string): Promise<Job[]> {
     return this.mongodb
       .collection(Collections.jobs)
@@ -110,6 +146,15 @@ export class CompaniesService {
       });
   }
 
+  /**
+   * Action to accept job request made by a student
+   *
+   * @param {AuthUser} user Firebase Auth company user
+   * @param {string} jobId id of requested job
+   * @param {string} studentId id of student to accept for job
+   * @return {*}  {Promise<boolean>} true if job was modified
+   * @memberof CompaniesService
+   */
   async acceptStudentRequest(
     //TODO send job request email
     user: AuthUser,
@@ -139,6 +184,15 @@ export class CompaniesService {
       });
   }
 
+  /**
+   * sends a new request mail to students
+   *
+   * @param {string} companyId Company's id
+   * @param {string} jobId id of job (Created by company with companyId)
+   * @param {string} studentId send mail to student with this id
+   * @return {*}  {Promise<InsertOneWriteOpResult<MailEntity>>}
+   * @memberof CompaniesService
+   */
   async sendJobRequestMail(
     companyId: string,
     jobId: string,

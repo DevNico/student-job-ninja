@@ -84,8 +84,13 @@ export class JobProcessor {
     }
     const jobFromDb = await this.mongodb
       .collection(Collections.jobs)
-      .findOne({ _id: job.data._id });
-    if (!jobFromDb.active) {
+      .findOne({ _id: job.data._id })
+      .catch((err) => {
+        this.logger.log(
+          `Job wit id ${job.data._id} not found in database: ${err.message}`,
+        );
+      });
+    if (!jobFromDb || !jobFromDb.active) {
       return 0;
     }
     const minSkillsRequired = 1;

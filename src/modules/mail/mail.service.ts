@@ -11,6 +11,12 @@ import { MailEntity } from './entities/mail.entity';
 import { join } from 'path';
 import * as fs from 'fs';
 
+/**
+ * Mailing service for sending Job request mails with handlebars template
+ *
+ * @export
+ * @class MailService
+ */
 @Injectable()
 export class MailService {
   constructor(
@@ -20,7 +26,14 @@ export class MailService {
   ) {}
   private readonly logger = new Logger(MailService.name);
 
-  //send a job offer to student and replace template text with handlebars (context)
+  /**
+   * send a job offer to student and replace template text
+   *
+   * @param {JobRequestMailData} mailData
+   * @param {MailEntity} mailEntity
+   * @return {*}  {Promise<InsertOneWriteOpResult<any>>}
+   * @memberof MailService
+   */
   async sendJobOffer(
     mailData: JobRequestMailData,
     mailEntity: MailEntity,
