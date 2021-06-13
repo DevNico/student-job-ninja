@@ -136,7 +136,8 @@ export class StudentsController {
   @ApiTags('students')
   @ApiOperation({ summary: 'accept job' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Job accepted',
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
@@ -157,7 +158,8 @@ export class StudentsController {
   @ApiTags('students')
   @ApiOperation({ summary: 'request job' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Job request send successfully',
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })

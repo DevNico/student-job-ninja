@@ -57,7 +57,8 @@ export class JobsController {
 
   @ApiOperation({ summary: 'get jobs by ids' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Array of Jobs with company.',
     type: JobWithCompany,
     isArray: true,
@@ -85,7 +86,8 @@ export class JobsController {
 
   @ApiOperation({ summary: 'search for Jobs' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Array of Matched Jobs',
     type: JobWithCompany,
     isArray: true,

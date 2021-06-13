@@ -45,6 +45,7 @@ export class CompaniesController {
     type: Company,
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 406, description: 'No acceptable.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard)
@@ -105,7 +106,8 @@ export class CompaniesController {
   @ApiTags('companies')
   @ApiOperation({ summary: 'create job' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Job created successfully.',
     type: Job,
   })
@@ -150,7 +152,8 @@ export class CompaniesController {
   @ApiTags('companies')
   @ApiOperation({ summary: 'add student to request' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'true if job modified successfully',
     type: Boolean,
     isArray: true,
