@@ -10,6 +10,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   Max,
   Min,
   MinLength,
@@ -36,6 +37,10 @@ export class StudentDto {
   @IsString()
   @IsOptional()
   description: string;
+
+  @IsOptional()
+  @IsUrl()
+  githubUrl: string;
 
   @IsInt()
   @Max(100)

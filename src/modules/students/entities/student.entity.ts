@@ -10,6 +10,7 @@ export class Student extends Entity {
   email: string;
   //equal to firebase -> firebase.entities
   identities?: any[];
+  githubUrl: string;
   firstName: string;
   lastName: string;
   description?: string;

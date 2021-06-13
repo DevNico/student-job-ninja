@@ -11,7 +11,7 @@ import { Job as BullJob, Queue } from 'bull';
 import { Db, InsertOneWriteOpResult } from 'mongodb';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { MailEntity } from 'src/modules/mail/entities/mail.entity';
-import { MailData } from 'src/modules/mail/interfaces/mail-data.interface';
+import { JobRequestMailData } from 'src/modules/mail/interfaces/mail-data.interface';
 import { MailService } from 'src/modules/mail/mail.service';
 import { StudentMatch } from 'src/modules/students/models/student-match.model';
 import { Company } from '../../companies/entities/company.entity';
@@ -73,19 +73,24 @@ export class JobProcessor {
   async matchJob(job: BullJob<Job>): Promise<number> {
     this.logger.log(`match job: '${JSON.stringify(job.data)}'`);
     const now = new Date(Date.now());
-    //todo replace with active field
+    const jobDate = new Date(job.data.from);
     if (
-      job.data.from.getFullYear == now.getFullYear &&
-      job.data.from.getMonth == now.getMonth &&
-      job.data.from.getDay == now.getDay
+      jobDate.getFullYear() == now.getFullYear() &&
+      jobDate.getMonth() == now.getMonth() &&
+      jobDate.getDay() == now.getDay()
     ) {
       this.logger.log(`Job outdated: '${JSON.stringify(job.data)}'`);
       return 0;
     }
     const jobFromDb = await this.mongodb
       .collection(Collections.jobs)
-      .findOne({ _id: job.data._id });
-    if (!jobFromDb.active) {
+      .findOne({ _id: job.data._id })
+      .catch((err) => {
+        this.logger.log(
+          `Job wit id ${job.data._id} not found in database: ${err.message}`,
+        );
+      });
+    if (!jobFromDb || !jobFromDb.active) {
       return 0;
     }
     const minSkillsRequired = 1;
@@ -108,7 +113,7 @@ export class JobProcessor {
       );
       return sentMails;
     } else {
-      console.log('no match found send to second queue');
+      this.logger.log('no match found send to second queue');
       await this.jobProcessorQueue
         .add('match', job, {
           delay: 86400000,
@@ -149,16 +154,17 @@ export class JobProcessor {
     student: StudentMatch,
     company: Company,
   ): Promise<InsertOneWriteOpResult<MailEntity>> {
-    //TODO: update email template and text
     //TODO: REMOVE MOCK
     return <InsertOneWriteOpResult<MailEntity>>{ insertedCount: 1 };
     const result = await this.mailService.sendJobOffer(
-      <MailData>{
+      <JobRequestMailData>{
         to: student.email,
-        title: `New Job request from ${company.name}`,
-        url: 'http://google.com',
-        text1: 'text1 template',
-        text2: 'text2 template',
+        companyName: company.name,
+        url: 'http://google.com', //TODO
+        jobName: job.jobName,
+        jobDescription: job.jobDescription,
+        fromDate: job.from.toDateString(),
+        toDate: job.to.toDateString(),
       },
       new MailEntity({
         companyId: job.publisher_id,

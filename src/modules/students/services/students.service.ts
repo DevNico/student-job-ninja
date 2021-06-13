@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotAcceptableException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
@@ -15,9 +16,14 @@ import { MailService } from '../../mail/mail.service';
 import { StudentDto } from '../dtos/create-student.dto';
 import { Student } from '../entities/student.entity';
 
+/**
+ * Service for handling actions triggered by student account
+ *
+ * @export
+ * @class StudentsService
+ */
 @Injectable()
 export class StudentsService {
-  //Use DI for mongodb client
   constructor(
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
@@ -26,10 +32,19 @@ export class StudentsService {
     private readonly mailService: MailService,
     private sharedDataAccessService: SharedDataAccessService,
   ) {}
+  private readonly logger = new Logger(StudentsService.name);
 
+  /**
+   * create new profile for student and store it in MongoDB
+   *
+   * @param {StudentDto} student student's data
+   * @param {AuthUser} _firebaseUser Firebase Auth user
+   * @return {*}  {Promise<Student>} created profile
+   * @memberof StudentsService
+   */
   async createStudent(
     student: StudentDto,
-    _firebaseUser: any,
+    _firebaseUser: AuthUser,
   ): Promise<Student> {
     //create the entity object and assign additional properties from firebase auth token
     const studentEntity = new Student(_firebaseUser.user_id, student);
@@ -65,6 +80,14 @@ export class StudentsService {
       });
   }
 
+  /**
+   * accept requested job and set students id as final accepted id ( only if job still active)
+   *
+   * @param {AuthUser} user Firebase Auth user
+   * @param {string} jobId id of accepted job
+   * @return {*}  {Promise<boolean>} true if job modified successfully
+   * @memberof StudentsService
+   */
   async acceptJob(user: AuthUser, jobId: string): Promise<boolean> {
     //TODO: send contact mail
     return this.mongodb
@@ -77,11 +100,19 @@ export class StudentsService {
         return result.modifiedCount > 0;
       })
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
   }
 
+  /**
+   * send a new job request to company (defined by job)
+   *
+   * @param {AuthUser} user Firebase Auth user
+   * @param {string} jobId requested job
+   * @return {*}  {Promise<boolean>} true if job was modified successfully
+   * @memberof StudentsService
+   */
   async requestJob(user: AuthUser, jobId: string): Promise<boolean> {
     //TODO: send new request mail to company
     return this.mongodb
@@ -94,11 +125,18 @@ export class StudentsService {
         return result.modifiedCount > 0;
       })
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
   }
 
+  /**
+   * list all job requests done by a student
+   *
+   * @param {AuthUser} user Firebase Auth user (student)
+   * @return {*}  {Promise<JobWithCompany[]>} list of requested jobs
+   * @memberof StudentsService
+   */
   async getAllJobRequests(user: AuthUser): Promise<JobWithCompany[]> {
     return this.mongodb
       .collection(Collections.jobs)

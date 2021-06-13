@@ -1,7 +1,10 @@
-export interface MailData {
+export interface JobRequestMailData {
   to: string;
-  title: string;
+  studentName: string;
   url: string;
-  text1: string;
-  text2: string;
+  companyName: string;
+  jobName: string;
+  fromDate: string;
+  toDate: string;
+  jobDescription: string;
 }

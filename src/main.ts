@@ -6,7 +6,9 @@ import { AppModule } from './app.module';
 import { writeFileSync } from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: true,
+  });
 
   app.use(function (req, res, next) {
     res.header('x-powered-by', '');
