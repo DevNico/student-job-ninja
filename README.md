@@ -1,6 +1,21 @@
 ## js-api-client@1.0
 
-This generator creates TypeScript/JavaScript client that utilizes fetch-api. 
+This generator creates TypeScript/JavaScript client that utilizes [Fetch API](https://fetch.spec.whatwg.org/). The generated Node module can be used in the following environments:
+
+Environment
+* Node.js
+* Webpack
+* Browserify
+
+Language level
+* ES5 - you must have a Promises/A+ library installed
+* ES6
+
+Module system
+* CommonJS
+* ES6 module system
+
+It can be used in both TypeScript and JavaScript. In TypeScript, the definition should be automatically resolved via `package.json`. ([Reference](http://www.typescriptlang.org/docs/handbook/typings-for-npm-packages.html))
 
 ### Building
 
