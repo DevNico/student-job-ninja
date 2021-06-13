@@ -6,6 +6,12 @@ import { Job } from '../companies/entities/job.entity';
 import { SearchJobDto } from './dtos/search-job.dto';
 import { JobWithCompany } from './models/job-with-company.model';
 
+/**
+ * Service for handling job specific actions account independent
+ *
+ * @export
+ * @class JobsService
+ */
 @Injectable()
 export class JobsService {
   constructor(
@@ -13,16 +19,37 @@ export class JobsService {
     private mongodb: Db,
   ) {}
 
+  /**
+   * Get a job by id from MongoDB
+   * @deprecated
+   * @param {string} jobId id of requested job
+   * @return {*}  {Promise<Job>} matched job
+   * @memberof JobsService
+   */
   async getJobById(jobId: string): Promise<Job> {
     return this.mongodb.collection(Collections.jobs).findOne({ _id: jobId });
   }
 
+  /**
+   * get a company by id from MongoDB
+   *
+   * @param {string} companyId id of requested company
+   * @return {*}  {Promise<Company>} matched company
+   * @memberof JobsService
+   */
   async getCompanyById(companyId: string): Promise<Company> {
     return this.mongodb
       .collection(Collections.Companies)
       .findOne({ _id: companyId });
   }
 
+  /**
+   * find multiple jobs and the creators by ids
+   *
+   * @param {string[]} jobsIds array of ids to look for
+   * @return {*}  {Promise<JobWithCompany[]>} Jobs with their creators
+   * @memberof JobsService
+   */
   async getJobsByIds(jobsIds: string[]): Promise<JobWithCompany[]> {
     return this.mongodb
       .collection(Collections.jobs)
@@ -56,6 +83,13 @@ export class JobsService {
       .toArray();
   }
 
+  /**
+   * Search for a job matching multiple criteria (Inc. full-text search)
+   *
+   * @param {SearchJobDto} searchQuery
+   * @return {*}  {Promise<JobWithCompany[]>}
+   * @memberof JobsService
+   */
   async searchJobs(searchQuery: SearchJobDto): Promise<JobWithCompany[]> {
     const aggMatchQuery = [];
     if (searchQuery.searchString && searchQuery.searchString.length > 0) {

@@ -16,7 +16,6 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     //get user data from previous auth guard
     const user: AuthUser = request.user;
-    console.log('usersroles', user.roles);
     //check if user has required role
     const hasRole = () =>
       !!user.roles.find((role) => !!roles.find((item) => item === role));

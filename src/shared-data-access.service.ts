@@ -2,6 +2,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotAcceptableException,
   NotFoundException,
   UnprocessableEntityException,
@@ -23,6 +24,7 @@ export class SharedDataAccessService {
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
   ) {}
+  private readonly logger = new Logger(SharedDataAccessService.name);
 
   async addUserToAuthStore(registryEntry: Registry): Promise<boolean> {
     return this.mongodb
@@ -30,7 +32,7 @@ export class SharedDataAccessService {
       .insertOne(registryEntry)
       .then((result) => {
         if (result && result.insertedCount > 0) {
-          console.log('inserted count', result.insertedCount);
+          this.logger.log('added user to auth store');
           return true;
         } else return false;
       })
@@ -48,7 +50,7 @@ export class SharedDataAccessService {
         return result as Registry;
       })
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         if (err.code === 404) throw new NotFoundException();
         throw new InternalServerErrorException();
       });
@@ -69,7 +71,7 @@ export class SharedDataAccessService {
         return result as T;
       })
       .catch((err) => {
-        console.error(err);
+        this.logger.error(err);
         if (err.code != 404) throw new NotFoundException();
         throw new InternalServerErrorException();
       });
@@ -88,7 +90,7 @@ export class SharedDataAccessService {
         { returnOriginal: false },
       )
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       })
       .then((result) => {
@@ -100,7 +102,6 @@ export class SharedDataAccessService {
   }
 
   async deleteProfile(user: AuthUser, collection: Collections): Promise<void> {
-    console.log(user.uid);
     const profileDeleteResult = this.mongodb
       .collection(collection)
       .deleteOne({ _id: user.uid });
@@ -108,6 +109,10 @@ export class SharedDataAccessService {
       .collection(Collections.Registry)
       .deleteOne({ _id: user.uid });
     Promise.all([profileDeleteResult, registryDeletedResult])
+      .catch((err) => {
+        this.logger.error(err);
+        throw new InternalServerErrorException();
+      })
       .then((resultValues) => {
         if (
           !resultValues[0] ||
@@ -115,12 +120,7 @@ export class SharedDataAccessService {
           resultValues[0].deletedCount < 1 ||
           resultValues[1].deletedCount < 1
         )
-          console.log(resultValues[0].deletedCount);
-        //throw new InternalServerErrorException(); //TODO: error handling
-      })
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException();
+          throw new UnprocessableEntityException();
       });
   }
 

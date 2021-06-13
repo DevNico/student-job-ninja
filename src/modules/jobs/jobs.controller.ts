@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -15,7 +16,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Job } from '../companies/entities/job.entity';
 import { SearchJobDto } from './dtos/search-job.dto';
 import { JobsService } from './jobs.service';
 import { JobWithCompany } from './models/job-with-company.model';
@@ -24,6 +24,7 @@ import { JobWithCompany } from './models/job-with-company.model';
 @Controller('jobs')
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
+  private readonly logger = new Logger(JobsController.name);
 
   @ApiOperation({ summary: 'get job by id' })
   @ApiBearerAuth()
@@ -44,13 +45,11 @@ export class JobsController {
         const resultCompany = await this.jobsService.getCompanyById(
           resultJob.publisher_id,
         );
-        console.log(resultCompany);
-        console.log(resultJob);
         return new JobWithCompany(resultJob, resultCompany);
       })
       .catch((err) => {
         if (err.code === 404) throw new NotFoundException();
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
     return resultJobMerged;
@@ -58,7 +57,8 @@ export class JobsController {
 
   @ApiOperation({ summary: 'get jobs by ids' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Array of Jobs with company.',
     type: JobWithCompany,
     isArray: true,
@@ -77,7 +77,7 @@ export class JobsController {
         throw new NotFoundException();
       })
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         if (err.code === 404) throw new NotFoundException();
         throw new InternalServerErrorException();
       });
@@ -86,7 +86,8 @@ export class JobsController {
 
   @ApiOperation({ summary: 'search for Jobs' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Array of Matched Jobs',
     type: JobWithCompany,
     isArray: true,
@@ -104,7 +105,7 @@ export class JobsController {
     return this.jobsService
       .searchJobs(searchQuery)
       .catch((error) => {
-        console.log(error);
+        this.logger.error(error);
         if (error.code === 404) throw new NotFoundException();
         throw new InternalServerErrorException();
       })

@@ -3,13 +3,20 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
-import { MailData } from './interfaces/mail-data.interface';
+import { JobRequestMailData } from './interfaces/mail-data.interface';
 import { Db, InsertOneWriteOpResult } from 'mongodb';
 import { MailEntity } from './entities/mail.entity';
 import { join } from 'path';
 import * as fs from 'fs';
 
+/**
+ * Mailing service for sending Job request mails with handlebars template
+ *
+ * @export
+ * @class MailService
+ */
 @Injectable()
 export class MailService {
   constructor(
@@ -17,10 +24,18 @@ export class MailService {
     private mongodb: Db,
     private mailerService: MailerService,
   ) {}
+  private readonly logger = new Logger(MailService.name);
 
-  //send a job offer to student and replace template text with handlebars (context)
+  /**
+   * send a job offer to student and replace template text
+   *
+   * @param {JobRequestMailData} mailData
+   * @param {MailEntity} mailEntity
+   * @return {*}  {Promise<InsertOneWriteOpResult<any>>}
+   * @memberof MailService
+   */
   async sendJobOffer(
-    mailData: MailData,
+    mailData: JobRequestMailData,
     mailEntity: MailEntity,
   ): Promise<InsertOneWriteOpResult<any>> {
     const path = join(
@@ -29,25 +44,26 @@ export class MailService {
       'modules',
       'mail',
       'mail-templates',
-      'example.hbs',
+      'job-request.hbs',
     );
     if (!fs.existsSync(path)) {
-      console.log('PATH not available: ', path);
+      this.logger.error('PATH not available: ', path);
       throw new InternalServerErrorException();
     }
     return this.mailerService
       .sendMail({
         to: mailData.to,
-        subject: 'subject',
+        subject: 'Neue Jobanfrage!',
         text: `text`,
         template: path,
         context: {
-          title: mailData.title,
+          studentName: mailData.studentName,
           url: mailData.url,
-          actionTitle: 'Anfrage akzeptieren',
-          app_name: 'Studentenjobbörse',
-          text1: mailData.text1,
-          text2: mailData.text2,
+          companyName: mailData.companyName,
+          jobName: mailData.jobName,
+          jobDescription: mailData.jobDescription,
+          fromDate: mailData.fromDate,
+          toDate: mailData.toDate,
         },
       })
       .catch((err) => {
@@ -58,7 +74,7 @@ export class MailService {
           .collection('mails')
           .insertOne(mailEntity)
           .catch((err) => {
-            console.log(err);
+            this.logger.error(err);
             throw new InternalServerErrorException();
           });
       });

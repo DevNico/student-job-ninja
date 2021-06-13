@@ -146,7 +146,6 @@ export class AppController {
   @Roles(Role.Company, Role.Student)
   @Get('user/test/u')
   async test(@Req() req: Express.Request): Promise<AuthUser> {
-    console.log('testing');
     const user = req.user;
     return user;
   }

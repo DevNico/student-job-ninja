@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  Logger,
   NotAcceptableException,
   Param,
   Post,
@@ -36,6 +37,7 @@ export class StudentsController {
     private studentsService: StudentsService,
     private readonly sharedDataAccessService: SharedDataAccessService,
   ) {}
+  private readonly logger = new Logger(StudentsController.name);
 
   //apply auth to signup endpoint
   @ApiTags('auth')
@@ -122,13 +124,11 @@ export class StudentsController {
     return this.studentsService
       .getAllJobRequests(req.user)
       .then((result) => {
-        console.log('result');
-        console.log(result);
         if (result.length > 0) return result;
         return [];
       })
       .catch((err) => {
-        console.log(err);
+        this.logger.error(err);
         throw new InternalServerErrorException();
       });
   }
@@ -136,7 +136,8 @@ export class StudentsController {
   @ApiTags('students')
   @ApiOperation({ summary: 'accept job' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Job accepted',
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
@@ -157,7 +158,8 @@ export class StudentsController {
   @ApiTags('students')
   @ApiOperation({ summary: 'request job' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Job request send successfully',
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })

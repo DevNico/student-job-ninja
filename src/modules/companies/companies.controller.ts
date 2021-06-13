@@ -45,6 +45,7 @@ export class CompaniesController {
     type: Company,
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 406, description: 'No acceptable.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard)
@@ -58,7 +59,6 @@ export class CompaniesController {
       email: companyData.email,
       roles: [Role.Company],
     });
-    console.log('log center');
     const result = this.companiesService.createCompany(companyData, req.user);
     return result;
   }
@@ -75,9 +75,8 @@ export class CompaniesController {
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Company)
   @Delete()
-  delete(@Req() req: Express.Request): any {
-    const result = this.companiesService.delete(req.user);
-    return result;
+  async delete(@Req() req: Express.Request): Promise<void> {
+    await this.companiesService.delete(req.user);
   }
 
   @ApiTags('companies')
@@ -107,7 +106,8 @@ export class CompaniesController {
   @ApiTags('companies')
   @ApiOperation({ summary: 'create job' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'Job created successfully.',
     type: Job,
   })
@@ -152,7 +152,8 @@ export class CompaniesController {
   @ApiTags('companies')
   @ApiOperation({ summary: 'add student to request' })
   @ApiBearerAuth()
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: 'true if job modified successfully',
     type: Boolean,
     isArray: true,

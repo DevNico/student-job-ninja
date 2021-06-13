@@ -10,6 +10,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   Max,
   Min,
   MinLength,
@@ -49,6 +50,10 @@ export class UpdateStudentDto {
   @ValidateNested()
   @Type(() => University)
   university: University;
+
+  @IsOptional()
+  @IsUrl()
+  githubUrl: string;
 
   @IsNotEmpty()
   @IsInt()
