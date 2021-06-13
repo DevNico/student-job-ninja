@@ -1,0 +1,19 @@
+{
+	"name": "js-api-client",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ss21-js/ss21-js-api-client.git"
+	},
+	"author": "Nicolas Schlecker",
+	"license": "UNLICENSED",
+	"bugs": {
+		"url": "https://github.com/ss21-js/ss21-js-api-client/issues"
+	},
+	"homepage": "https://github.com/ss21-js/ss21-js-api-client#readme"
+}
