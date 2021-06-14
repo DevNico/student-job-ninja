@@ -43,6 +43,10 @@ export class AppController {
     status: 403,
     description: 'Forbidden Ressource. User has no role.',
   })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   //@Roles(Role.Company, Role.Student)
@@ -79,8 +83,7 @@ export class AppController {
         userData: profile,
         assignedJobs: CompanysJobs,
       };
-    }
-    throw new ForbiddenException();
+    } else throw new ForbiddenException();
   }
 
   @ApiTags('global')
