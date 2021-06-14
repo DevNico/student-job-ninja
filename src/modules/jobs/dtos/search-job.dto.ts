@@ -13,12 +13,10 @@ import {
 
 export class SearchJobDto {
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
   searchString: string;
 
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
   workArea: string;
 
@@ -29,18 +27,14 @@ export class SearchJobDto {
   workBasis: number;
 
   @IsOptional()
-  @IsNotEmpty()
   @IsString({ each: true })
   @IsArray()
-  @ArrayMinSize(1)
   @ArrayMaxSize(15)
   languages: string[];
 
   @IsOptional()
-  @IsNotEmpty()
   @IsString({ each: true })
   @IsArray()
-  @ArrayMinSize(1)
   @ArrayMaxSize(15)
   skills: string[];
 
@@ -55,4 +49,14 @@ export class SearchJobDto {
   @Type(() => Date)
   @IsDate()
   to: Date;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  skip: number;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  limit: number;
 }
