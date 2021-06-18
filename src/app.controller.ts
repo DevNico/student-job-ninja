@@ -43,14 +43,20 @@ export class AppController {
     status: 403,
     description: 'Forbidden Ressource. User has no role.',
   })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
-  @Roles(Role.Company, Role.Student)
+  //@Roles(Role.Company, Role.Student)
   @CacheTTL(20)
   @Get('user/me')
   async getOwnProfile(@Req() req: Express.Request): Promise<UserResponse> {
     const roles = req.user.roles;
-    //TODO refactor #5
+
+    if (roles.length < 0) throw new NotFoundException();
+
     if (roles.includes(Role.Student)) {
       const profile = await this.sharedDataAccessService.getUserById<Student>(
         req.user.uid,
@@ -77,8 +83,7 @@ export class AppController {
         userData: profile,
         assignedJobs: CompanysJobs,
       };
-    }
-    throw new ForbiddenException();
+    } else throw new ForbiddenException();
   }
 
   @ApiTags('global')

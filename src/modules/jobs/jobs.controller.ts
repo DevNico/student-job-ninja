@@ -100,10 +100,10 @@ export class JobsController {
     excludePrefixes: ['_'],
   })
   async searchJobs(
-    @Body() searchQuery: SearchJobDto,
+    @Body() searchJobDto: SearchJobDto,
   ): Promise<JobWithCompany[]> {
     return this.jobsService
-      .searchJobs(searchQuery)
+      .searchJobs(searchJobDto)
       .catch((error) => {
         this.logger.error(error);
         if (error.code === 404) throw new NotFoundException();

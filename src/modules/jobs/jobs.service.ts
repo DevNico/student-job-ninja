@@ -86,71 +86,82 @@ export class JobsService {
   /**
    * Search for a job matching multiple criteria (Inc. full-text search)
    *
-   * @param {SearchJobDto} searchQuery
+   * @param {SearchJobDto} searchDto
    * @return {*}  {Promise<JobWithCompany[]>}
    * @memberof JobsService
    */
-  async searchJobs(searchQuery: SearchJobDto): Promise<JobWithCompany[]> {
+  async searchJobs(searchDto: SearchJobDto): Promise<JobWithCompany[]> {
     const aggMatchQuery = [];
-    if (searchQuery.searchString && searchQuery.searchString.length > 0) {
+    if (searchDto.searchString && searchDto.searchString.length > 0) {
       aggMatchQuery.push({
-        $match: { $text: { $search: searchQuery.searchString }, active: true },
+        $match: { $text: { $search: searchDto.searchString }, active: true },
       });
     }
-    if (searchQuery.workArea && searchQuery.workArea.length > 0) {
+    if (searchDto.workArea && searchDto.workArea.length > 0) {
       aggMatchQuery.push({
         $match: {
-          workArea: searchQuery.workArea,
+          workArea: searchDto.workArea,
         },
       });
     }
-    if (searchQuery.workBasis && searchQuery.workBasis > 0) {
+    if (searchDto.workBasis && searchDto.workBasis > 0) {
       aggMatchQuery.push({
         $match: {
-          workBasis: searchQuery.workBasis,
+          workBasis: searchDto.workBasis,
         },
       });
     }
-    if (searchQuery.languages && searchQuery.languages.length > 0) {
+    if (searchDto.languages && searchDto.languages.length > 0) {
       aggMatchQuery.push({
         $match: {
           $expr: {
-            $setIsSubset: [searchQuery.languages, '$languages'],
+            $setIsSubset: [searchDto.languages, '$languages'],
           },
         },
       });
     }
-    if (searchQuery.skills && searchQuery.skills.length > 0) {
+    if (searchDto.skills && searchDto.skills.length > 0) {
       aggMatchQuery.push({
         $match: {
           $expr: {
-            $setIsSubset: [searchQuery.skills, '$skills'],
+            $setIsSubset: [searchDto.skills, '$skills'],
           },
         },
       });
     }
 
-    if (searchQuery.from) {
+    if (searchDto.from) {
       aggMatchQuery.push({
         $match: {
           from: {
-            $gte: new Date(searchQuery.from),
+            $gte: new Date(searchDto.from),
           },
           to: {
-            $gte: new Date(searchQuery.to),
+            $gte: new Date(searchDto.to),
           },
         },
       });
     }
-    if (searchQuery.to) {
+    if (searchDto.to) {
       aggMatchQuery.push({
         $match: {
           to: {
-            $gte: new Date(searchQuery.to),
+            $gte: new Date(searchDto.to),
           },
         },
       });
     }
+    //push skip if available
+    if (searchDto.skip && searchDto.skip > 0) {
+      aggMatchQuery.push({
+        $skip: searchDto.skip,
+      });
+    }
+    //push limit if available
+    if (!searchDto.limit || searchDto.limit < 10) searchDto.limit = 25;
+    aggMatchQuery.push({
+      $limit: searchDto.limit,
+    });
     return this.mongodb
       .collection(Collections.jobs)
       .aggregate(
