@@ -1,0 +1,52 @@
+name: api_client
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  api_client:
+    name: API Client generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Registry
+        run: docker login --username "$DOCKER_USERNAME" --password-stdin <<< "$DOCKER_TOKEN"
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Go to directory
+        run: cd $GITHUB_WORKSPACE/local-db
+
+      - name: Start env
+        run: docker-compose up
+
+      - name: Go back to root directory
+        run: cd $GITHUB_WORKSPACE
+
+      - name: Go back to root directory
+        run: cd $GITHUB_WORKSPACE
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+
+      - name: Upgrade npm to v7
+        run: npm install -g npm@7
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run nestjs
+        run: npm run start
+        env:
+          openapi: true
+      - name: Archive openapi.json
+        uses: actions/upload-artifact@master
+        with:
+          name: openapi.json
+          path: openapi.json
