@@ -47,6 +47,12 @@ export interface Student {
      * @type {string}
      * @memberof Student
      */
+    githubUrl: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Student
+     */
     firstName: string;
     /**
      * 
@@ -140,6 +146,7 @@ export function StudentFromJSONTyped(json: any, ignoreDiscriminator: boolean): S
         
         'email': json['email'],
         'identities': !exists(json, 'identities') ? undefined : json['identities'],
+        'githubUrl': json['githubUrl'],
         'firstName': json['firstName'],
         'lastName': json['lastName'],
         'description': !exists(json, 'description') ? undefined : json['description'],
@@ -168,6 +175,7 @@ export function StudentToJSON(value?: Student | null): any {
         
         'email': value.email,
         'identities': value.identities,
+        'githubUrl': value.githubUrl,
         'firstName': value.firstName,
         'lastName': value.lastName,
         'description': value.description,

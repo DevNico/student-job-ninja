@@ -62,6 +62,12 @@ export interface UpdateStudentDto {
     lastName: string;
     /**
      * 
+     * @type {string}
+     * @memberof UpdateStudentDto
+     */
+    githubUrl: string;
+    /**
+     * 
      * @type {number}
      * @memberof UpdateStudentDto
      */
@@ -131,6 +137,7 @@ export function UpdateStudentDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
         'email': json['email'],
         'firstName': json['firstName'],
         'lastName': json['lastName'],
+        'githubUrl': json['githubUrl'],
         'semester': json['semester'],
         'skills': json['skills'],
         'languages': json['languages'],
@@ -157,6 +164,7 @@ export function UpdateStudentDtoToJSON(value?: UpdateStudentDto | null): any {
         'email': value.email,
         'firstName': value.firstName,
         'lastName': value.lastName,
+        'githubUrl': value.githubUrl,
         'semester': value.semester,
         'skills': value.skills,
         'languages': value.languages,

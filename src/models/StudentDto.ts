@@ -68,6 +68,12 @@ export interface StudentDto {
     description: string;
     /**
      * 
+     * @type {string}
+     * @memberof StudentDto
+     */
+    githubUrl: string;
+    /**
+     * 
      * @type {object}
      * @memberof StudentDto
      */
@@ -132,6 +138,7 @@ export function StudentDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'firstName': json['firstName'],
         'lastName': json['lastName'],
         'description': json['description'],
+        'githubUrl': json['githubUrl'],
         'yearsOfExperience': json['yearsOfExperience'],
         'semester': json['semester'],
         'skills': json['skills'],
@@ -158,6 +165,7 @@ export function StudentDtoToJSON(value?: StudentDto | null): any {
         'firstName': value.firstName,
         'lastName': value.lastName,
         'description': value.description,
+        'githubUrl': value.githubUrl,
         'yearsOfExperience': value.yearsOfExperience,
         'semester': value.semester,
         'skills': value.skills,
