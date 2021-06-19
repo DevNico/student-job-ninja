@@ -65,7 +65,7 @@ export function UserResponseToJSON(value?: UserResponse | null): any {
 	}
 	return {
 		userType: value.userType,
-		userData: value.userData,
+		userData: value.userType === 'student' ? StudentToJSON(value.userData as Student) : CompanyToJSON(value.userData as Company),
 		assignedJobs: value.assignedJobs,
 	};
 }
