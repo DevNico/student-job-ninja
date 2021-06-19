@@ -1,4 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { Db } from 'mongodb';
 import { Collections } from 'src/common/enums/colletions.enum';
 import { Company } from '../companies/entities/company.entity';
@@ -17,6 +18,8 @@ export class JobsService {
   constructor(
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {}
 
   /**
@@ -91,6 +94,13 @@ export class JobsService {
    * @memberof JobsService
    */
   async searchJobs(searchDto: SearchJobDto): Promise<JobWithCompany[]> {
+    const cacheKey = `${searchDto}`;
+    const chacheResult = await this.cacheManager.get<JobWithCompany[]>(
+      cacheKey,
+    );
+    if (chacheResult && chacheResult != null && chacheResult.length > 0) {
+      return chacheResult;
+    }
     const aggMatchQuery = [];
     if (searchDto.searchString && searchDto.searchString.length > 0) {
       aggMatchQuery.push({
@@ -162,7 +172,7 @@ export class JobsService {
     aggMatchQuery.push({
       $limit: searchDto.limit,
     });
-    return this.mongodb
+    const result = await this.mongodb
       .collection(Collections.jobs)
       .aggregate(
         [
@@ -186,5 +196,7 @@ export class JobsService {
         { allowDiskUse: true },
       )
       .toArray();
+    await this.cacheManager.set(cacheKey, result, 3600);
+    return result;
   }
 }

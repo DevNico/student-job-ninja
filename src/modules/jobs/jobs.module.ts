@@ -7,6 +7,7 @@ import { JobsService } from './jobs.service';
 import { JobProcessor } from './processors/job-matching.processor';
 import { ScheduleModule } from '@nestjs/schedule';
 import { JobActiveCronTask } from './processors/job-active-cron.processor';
+import { CacheManagerModule } from 'src/common/caching/cache-manager.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { JobActiveCronTask } from './processors/job-active-cron.processor';
     }),
     MongoModule,
     MailModule,
+    CacheManagerModule,
   ],
   controllers: [JobsController],
   providers: [JobsService, JobProcessor, JobActiveCronTask],

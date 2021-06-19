@@ -100,6 +100,7 @@ export class StudentsController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiResponse({ status: 400, description: 'student has running jobs' })
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Student)

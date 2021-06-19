@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   CACHE_MANAGER,
   Inject,
   Injectable,
@@ -28,7 +29,7 @@ export class StudentsService {
     @Inject('MONGO_CONNECTION')
     private mongodb: Db,
     @Inject(CACHE_MANAGER)
-    private cacheManager: Cache, //TODO: testing
+    private cacheManager: Cache,
     private readonly mailService: MailService,
     private sharedDataAccessService: SharedDataAccessService,
   ) {}
@@ -69,8 +70,13 @@ export class StudentsService {
   }
 
   async delete(user: AuthUser): Promise<void> {
-    //TODO: check for unfinished but accepted jobs -> reject
-    //TODO: delete accepted and finished jobs
+    const today = new Date(Date.now());
+    //check for unfinished but accepted jobs -> reject
+    const unfinishedJobs = await this.mongodb
+      .collection(Collections.jobs)
+      .find({ final_accepted_id: user.uid, to: { $gte: today } })
+      .toArray();
+    if (unfinishedJobs.length > 0) throw new BadRequestException();
 
     //delete profile by id
     await this.sharedDataAccessService

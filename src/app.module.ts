@@ -14,6 +14,8 @@ import { StudentsService } from './modules/students/services/students.service';
 import { FirebaseAdminModule } from './providers/firebase/firebase-admin.module';
 import { SharedDataAccessService } from './shared-data-access.service';
 import { BullModule } from '@nestjs/bull';
+import { CacheManagerModule } from './common/caching/cache-manager.module';
+import { JobsService } from './modules/jobs/jobs.service';
 
 @Module({
   imports: [

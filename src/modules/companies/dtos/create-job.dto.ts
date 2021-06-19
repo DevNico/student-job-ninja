@@ -6,6 +6,7 @@ import {
   IsEmail,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Length,
   Max,
@@ -22,6 +23,10 @@ export class CreateJobDto {
   @Length(5, 200)
   jobName: string;
 
+  @IsOptional()
+  @IsString()
+  headerImageUrl: string;
+
   @IsString()
   @Length(1, 500)
   jobDescription: string;
@@ -33,7 +38,6 @@ export class CreateJobDto {
   @IsArray()
   skills: string[];
 
-  //TODO: enum
   @IsNotEmpty()
   @IsString()
   workArea: string;

@@ -10,7 +10,8 @@ export class Company extends Entity {
   name: string;
   company_info: string;
   homepage: string;
-  image_url: string;
+  companyProfileImageUrl = '';
+  companyHeaderImageUrl = '';
   @ApiProperty({
     description: 'address field',
     type: Address,

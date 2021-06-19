@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   Length,
   ValidateNested,
 } from 'class-validator';
@@ -16,6 +17,14 @@ export class CompanyDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsOptional()
+  @IsUrl()
+  companyProfileImageUrl: string;
+
+  @IsOptional()
+  @IsUrl()
+  companyHeaderImageUrl: string;
 
   @IsString()
   @IsNotEmpty()

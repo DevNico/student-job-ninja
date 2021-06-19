@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -75,10 +76,26 @@ export class CompaniesService {
    * @memberof CompaniesService
    */
   async delete(user: AuthUser): Promise<void> {
-    //TODO: check for unfinished but requested jobs -> reject
+    const today = new Date(Date.now());
+    const activeJobs = await this.mongodb
+      .collection(Collections.jobs)
+      .find({ publisher_id: user.uid, active: true })
+      .toArray();
 
-    //TODO: delete all job offers
-
+    const unfinishedJobs = await this.mongodb
+      .collection(Collections.jobs)
+      .find({
+        publisher_id: user.uid,
+        final_accepted_id: /^[\s\S]{20,}$/,
+        to: { $gte: today },
+      })
+      .toArray();
+    if (activeJobs.length > 0 || unfinishedJobs.length > 0)
+      throw new BadRequestException();
+    //delete completed jobs
+    await this.mongodb
+      .collection(Collections.jobs)
+      .deleteMany({ publisher_id: user.uid });
     //delete profile and registry by id
     await this.sharedDataAccessService
       .deleteProfile(user, Collections.Companies)
@@ -156,11 +173,11 @@ export class CompaniesService {
    * @memberof CompaniesService
    */
   async acceptStudentRequest(
-    //TODO send job request email
     user: AuthUser,
     jobId: string,
     studentId: string,
   ): Promise<boolean> {
+    await this.sendJobRequestMail(user.uid, jobId, studentId);
     return this.mongodb
       .collection(Collections.jobs)
       .updateOne(
@@ -228,28 +245,5 @@ export class CompaniesService {
     } catch (err) {
       this.logger.error(err);
     }
-  }
-
-  //TODO remove
-  async sendTestMail(): Promise<any> {
-    const result = await this.mailService.sendJobOffer(
-      <JobRequestMailData>{
-        to: 'kev.ed.simon@gmail.com',
-        studentName: ' Kevin Eder',
-        url: 'http://google.com',
-        companyName: 'Firma GmBH',
-        jobName: 'Full stack entwickler',
-        fromDate: '12-05-2021',
-        toDate: '12-06-2021',
-        jobDescription:
-          'ich bin ein beispiel job der nur zu testzwecken erstellt wurde',
-      },
-      new MailEntity({
-        companyId: '1234company',
-        jobId: uuid(),
-        studentId: '1234studentid',
-      }),
-    );
-    return result;
   }
 }
