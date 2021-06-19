@@ -33,7 +33,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   if (process.env['openapi']) {
-    console.log(document);
     writeFileSync('./openapi.json', JSON.stringify(document));
     process.exit();
   }
