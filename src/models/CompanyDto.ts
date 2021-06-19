@@ -49,6 +49,18 @@ export interface CompanyDto {
      * @type {string}
      * @memberof CompanyDto
      */
+    companyProfileImageUrl: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
+    companyHeaderImageUrl: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
     companyInfo: string;
     /**
      * 
@@ -71,6 +83,8 @@ export function CompanyDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'address': AddressFromJSON(json['address']),
         'email': json['email'],
         'name': json['name'],
+        'companyProfileImageUrl': json['companyProfileImageUrl'],
+        'companyHeaderImageUrl': json['companyHeaderImageUrl'],
         'companyInfo': json['company_info'],
         'homepage': !exists(json, 'homepage') ? undefined : json['homepage'],
     };
@@ -88,6 +102,8 @@ export function CompanyDtoToJSON(value?: CompanyDto | null): any {
         'address': AddressToJSON(value.address),
         'email': value.email,
         'name': value.name,
+        'companyProfileImageUrl': value.companyProfileImageUrl,
+        'companyHeaderImageUrl': value.companyHeaderImageUrl,
         'company_info': value.companyInfo,
         'homepage': value.homepage,
     };

@@ -51,7 +51,7 @@ export function UserResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
 	}
 	return {
 		userType: json['userType'],
-		userData: json['userData'],
+		userData: json['userType'] === 'student' ? StudentFromJSON(json['userData']) : CompanyFromJSON(json['userData']),
 		assignedJobs: json['assignedJobs'],
 	};
 }

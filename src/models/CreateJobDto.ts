@@ -36,6 +36,12 @@ export interface CreateJobDto {
      * @type {string}
      * @memberof CreateJobDto
      */
+    headerImageUrl: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateJobDto
+     */
     jobDescription: string;
     /**
      * 
@@ -93,6 +99,7 @@ export function CreateJobDtoFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'contactMail': json['contactMail'],
         'jobName': json['jobName'],
+        'headerImageUrl': json['headerImageUrl'],
         'jobDescription': json['jobDescription'],
         'jobQualifications': json['jobQualifications'],
         'skills': json['skills'],
@@ -115,6 +122,7 @@ export function CreateJobDtoToJSON(value?: CreateJobDto | null): any {
         
         'contactMail': value.contactMail,
         'jobName': value.jobName,
+        'headerImageUrl': value.headerImageUrl,
         'jobDescription': value.jobDescription,
         'jobQualifications': value.jobQualifications,
         'skills': value.skills,

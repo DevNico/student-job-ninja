@@ -61,6 +61,18 @@ export interface SearchJobDto {
      * @memberof SearchJobDto
      */
     to: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof SearchJobDto
+     */
+    skip: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SearchJobDto
+     */
+    limit: number;
 }
 
 export function SearchJobDtoFromJSON(json: any): SearchJobDto {
@@ -80,6 +92,8 @@ export function SearchJobDtoFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'skills': json['skills'],
         'from': (new Date(json['from'])),
         'to': (new Date(json['to'])),
+        'skip': json['skip'],
+        'limit': json['limit'],
     };
 }
 
@@ -99,6 +113,8 @@ export function SearchJobDtoToJSON(value?: SearchJobDto | null): any {
         'skills': value.skills,
         'from': (value.from.toISOString()),
         'to': (value.to.toISOString()),
+        'skip': value.skip,
+        'limit': value.limit,
     };
 }
 

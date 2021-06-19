@@ -103,27 +103,4 @@ export class DefaultApi extends runtime.BaseAPI {
         return await response.value();
     }
 
-    /**
-     */
-    async companiesControllerSendTestMailRaw(): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/companies/testmail`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async companiesControllerSendTestMail(): Promise<void> {
-        await this.companiesControllerSendTestMailRaw();
-    }
-
 }

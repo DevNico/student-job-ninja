@@ -45,6 +45,12 @@ export interface Job {
     jobName: string;
     /**
      * 
+     * @type {object}
+     * @memberof Job
+     */
+    headerImageUrl: object;
+    /**
+     * 
      * @type {string}
      * @memberof Job
      */
@@ -131,6 +137,7 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
         'publisherId': json['publisher_id'],
         'contactMail': json['contactMail'],
         'jobName': json['jobName'],
+        'headerImageUrl': json['headerImageUrl'],
         'jobDescription': json['jobDescription'],
         'jobQualifications': json['jobQualifications'],
         'skills': json['skills'],
@@ -159,6 +166,7 @@ export function JobToJSON(value?: Job | null): any {
         'publisher_id': value.publisherId,
         'contactMail': value.contactMail,
         'jobName': value.jobName,
+        'headerImageUrl': value.headerImageUrl,
         'jobDescription': value.jobDescription,
         'jobQualifications': value.jobQualifications,
         'skills': value.skills,

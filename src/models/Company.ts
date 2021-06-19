@@ -64,10 +64,16 @@ export interface Company {
     homepage: string;
     /**
      * 
-     * @type {string}
+     * @type {object}
      * @memberof Company
      */
-    imageUrl: string;
+    companyProfileImageUrl: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof Company
+     */
+    companyHeaderImageUrl: object;
 }
 
 export function CompanyFromJSON(json: any): Company {
@@ -86,7 +92,8 @@ export function CompanyFromJSONTyped(json: any, ignoreDiscriminator: boolean): C
         'name': json['name'],
         'companyInfo': json['company_info'],
         'homepage': json['homepage'],
-        'imageUrl': json['image_url'],
+        'companyProfileImageUrl': json['companyProfileImageUrl'],
+        'companyHeaderImageUrl': json['companyHeaderImageUrl'],
     };
 }
 
@@ -105,7 +112,8 @@ export function CompanyToJSON(value?: Company | null): any {
         'name': value.name,
         'company_info': value.companyInfo,
         'homepage': value.homepage,
-        'image_url': value.imageUrl,
+        'companyProfileImageUrl': value.companyProfileImageUrl,
+        'companyHeaderImageUrl': value.companyHeaderImageUrl,
     };
 }
 
