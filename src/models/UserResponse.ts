@@ -28,7 +28,7 @@ export interface UserResponse {
 	 */
 	userType: string;
 	/**
-	 * Student entity
+	 * Student or Company entity
 	 * @type {Student | Company}
 	 * @memberof UserResponse
 	 */

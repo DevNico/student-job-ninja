@@ -13,121 +13,134 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    Company,
+    CompanyFromJSON,
+    CompanyFromJSONTyped,
+    CompanyToJSON,
+} from './';
+
 /**
  * 
  * @export
- * @interface Job
+ * @interface JobWithCompany
  */
-export interface Job {
+export interface JobWithCompany {
     /**
-     * id
+     * 
      * @type {string}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     id: string;
     /**
      * 
      * @type {string}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     publisherId: string;
     /**
      * 
      * @type {string}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     contactMail: string;
     /**
      * 
      * @type {string}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     jobName: string;
     /**
      * 
-     * @type {object}
-     * @memberof Job
-     */
-    headerImageUrl: object;
-    /**
-     * 
      * @type {string}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     jobDescription: string;
     /**
      * 
      * @type {Array<string>}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     jobQualifications: Array<string>;
     /**
      * 
      * @type {Array<string>}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     skills: Array<string>;
     /**
      * 
      * @type {string}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     workArea: string;
     /**
      * 
      * @type {number}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     workBasis: number;
     /**
      * 
      * @type {Array<string>}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     languages: Array<string>;
     /**
      * 
      * @type {Date}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     from: Date;
     /**
      * 
      * @type {Date}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     to: Date;
     /**
      * 
-     * @type {boolean}
-     * @memberof Job
-     */
-    active: boolean;
-    /**
-     * 
      * @type {Array<string>}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     requestedByStudents: Array<string>;
     /**
      * 
      * @type {Array<string>}
-     * @memberof Job
+     * @memberof JobWithCompany
      */
     requestedIds: Array<string>;
     /**
      * 
-     * @type {object}
-     * @memberof Job
+     * @type {string}
+     * @memberof JobWithCompany
      */
-    finalAcceptedId: object;
+    finalAcceptedId: string;
+    /**
+     * 
+     * @type {Company}
+     * @memberof JobWithCompany
+     */
+    publisher: Company;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof JobWithCompany
+     */
+    active: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobWithCompany
+     */
+    headerImageUrl: string;
 }
 
-export function JobFromJSON(json: any): Job {
-    return JobFromJSONTyped(json, false);
+export function JobWithCompanyFromJSON(json: any): JobWithCompany {
+    return JobWithCompanyFromJSONTyped(json, false);
 }
 
-export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
+export function JobWithCompanyFromJSONTyped(json: any, ignoreDiscriminator: boolean): JobWithCompany {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -137,7 +150,6 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
         'publisherId': json['publisher_id'],
         'contactMail': json['contactMail'],
         'jobName': json['jobName'],
-        'headerImageUrl': json['headerImageUrl'],
         'jobDescription': json['jobDescription'],
         'jobQualifications': json['jobQualifications'],
         'skills': json['skills'],
@@ -146,14 +158,16 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
         'languages': json['languages'],
         'from': (new Date(json['from'])),
         'to': (new Date(json['to'])),
-        'active': json['active'],
         'requestedByStudents': json['requested_by_students'],
         'requestedIds': json['requested_ids'],
         'finalAcceptedId': json['final_accepted_id'],
+        'publisher': CompanyFromJSON(json['publisher']),
+        'active': json['active'],
+        'headerImageUrl': json['headerImageUrl'],
     };
 }
 
-export function JobToJSON(value?: Job | null): any {
+export function JobWithCompanyToJSON(value?: JobWithCompany | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -166,7 +180,6 @@ export function JobToJSON(value?: Job | null): any {
         'publisher_id': value.publisherId,
         'contactMail': value.contactMail,
         'jobName': value.jobName,
-        'headerImageUrl': value.headerImageUrl,
         'jobDescription': value.jobDescription,
         'jobQualifications': value.jobQualifications,
         'skills': value.skills,
@@ -175,10 +188,12 @@ export function JobToJSON(value?: Job | null): any {
         'languages': value.languages,
         'from': (value.from.toISOString()),
         'to': (value.to.toISOString()),
-        'active': value.active,
         'requested_by_students': value.requestedByStudents,
         'requested_ids': value.requestedIds,
         'final_accepted_id': value.finalAcceptedId,
+        'publisher': CompanyToJSON(value.publisher),
+        'active': value.active,
+        'headerImageUrl': value.headerImageUrl,
     };
 }
 

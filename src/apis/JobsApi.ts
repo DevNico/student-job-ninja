@@ -15,6 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
+    JobWithCompany,
+    JobWithCompanyFromJSON,
+    JobWithCompanyToJSON,
     SearchJobDto,
     SearchJobDtoFromJSON,
     SearchJobDtoToJSON,
@@ -40,7 +43,7 @@ export class JobsApi extends runtime.BaseAPI {
     /**
      * get job by id
      */
-    async jobsControllerGetJobByIdRaw(requestParameters: JobsControllerGetJobByIdRequest): Promise<runtime.ApiResponse<object>> {
+    async jobsControllerGetJobByIdRaw(requestParameters: JobsControllerGetJobByIdRequest): Promise<runtime.ApiResponse<JobWithCompany>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling jobsControllerGetJobById.');
         }
@@ -56,13 +59,13 @@ export class JobsApi extends runtime.BaseAPI {
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => JobWithCompanyFromJSON(jsonValue));
     }
 
     /**
      * get job by id
      */
-    async jobsControllerGetJobById(requestParameters: JobsControllerGetJobByIdRequest): Promise<object> {
+    async jobsControllerGetJobById(requestParameters: JobsControllerGetJobByIdRequest): Promise<JobWithCompany> {
         const response = await this.jobsControllerGetJobByIdRaw(requestParameters);
         return await response.value();
     }
@@ -70,7 +73,7 @@ export class JobsApi extends runtime.BaseAPI {
     /**
      * get jobs by ids
      */
-    async jobsControllerGetJobsByIdRaw(requestParameters: JobsControllerGetJobsByIdRequest): Promise<runtime.ApiResponse<Array<object>>> {
+    async jobsControllerGetJobsByIdRaw(requestParameters: JobsControllerGetJobsByIdRequest): Promise<runtime.ApiResponse<Array<JobWithCompany>>> {
         if (requestParameters.requestBody === null || requestParameters.requestBody === undefined) {
             throw new runtime.RequiredError('requestBody','Required parameter requestParameters.requestBody was null or undefined when calling jobsControllerGetJobsById.');
         }
@@ -89,13 +92,13 @@ export class JobsApi extends runtime.BaseAPI {
             body: requestParameters.requestBody,
         });
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(JobWithCompanyFromJSON));
     }
 
     /**
      * get jobs by ids
      */
-    async jobsControllerGetJobsById(requestParameters: JobsControllerGetJobsByIdRequest): Promise<Array<object>> {
+    async jobsControllerGetJobsById(requestParameters: JobsControllerGetJobsByIdRequest): Promise<Array<JobWithCompany>> {
         const response = await this.jobsControllerGetJobsByIdRaw(requestParameters);
         return await response.value();
     }
@@ -103,7 +106,7 @@ export class JobsApi extends runtime.BaseAPI {
     /**
      * search for Jobs
      */
-    async jobsControllerSearchJobsRaw(requestParameters: JobsControllerSearchJobsRequest): Promise<runtime.ApiResponse<Array<object>>> {
+    async jobsControllerSearchJobsRaw(requestParameters: JobsControllerSearchJobsRequest): Promise<runtime.ApiResponse<Array<JobWithCompany>>> {
         if (requestParameters.searchJobDto === null || requestParameters.searchJobDto === undefined) {
             throw new runtime.RequiredError('searchJobDto','Required parameter requestParameters.searchJobDto was null or undefined when calling jobsControllerSearchJobs.');
         }
@@ -122,13 +125,13 @@ export class JobsApi extends runtime.BaseAPI {
             body: SearchJobDtoToJSON(requestParameters.searchJobDto),
         });
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(JobWithCompanyFromJSON));
     }
 
     /**
      * search for Jobs
      */
-    async jobsControllerSearchJobs(requestParameters: JobsControllerSearchJobsRequest): Promise<Array<object>> {
+    async jobsControllerSearchJobs(requestParameters: JobsControllerSearchJobsRequest): Promise<Array<JobWithCompany>> {
         const response = await this.jobsControllerSearchJobsRaw(requestParameters);
         return await response.value();
     }

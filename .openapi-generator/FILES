@@ -15,6 +15,7 @@ src/models/Company.ts
 src/models/CompanyDto.ts
 src/models/CreateJobDto.ts
 src/models/Job.ts
+src/models/JobWithCompany.ts
 src/models/SearchJobDto.ts
 src/models/Student.ts
 src/models/StudentDto.ts

@@ -3,6 +3,7 @@ export * from './Company';
 export * from './CompanyDto';
 export * from './CreateJobDto';
 export * from './Job';
+export * from './JobWithCompany';
 export * from './SearchJobDto';
 export * from './Student';
 export * from './StudentDto';
