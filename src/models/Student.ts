@@ -31,6 +31,12 @@ import {
  */
 export interface Student {
     /**
+     * id
+     * @type {string}
+     * @memberof Student
+     */
+    id: string;
+    /**
      * 
      * @type {string}
      * @memberof Student
@@ -144,6 +150,7 @@ export function StudentFromJSONTyped(json: any, ignoreDiscriminator: boolean): S
     }
     return {
         
+        'id': json['_id'],
         'email': json['email'],
         'identities': !exists(json, 'identities') ? undefined : json['identities'],
         'githubUrl': json['githubUrl'],
@@ -173,6 +180,7 @@ export function StudentToJSON(value?: Student | null): any {
     }
     return {
         
+        '_id': value.id,
         'email': value.email,
         'identities': value.identities,
         'githubUrl': value.githubUrl,

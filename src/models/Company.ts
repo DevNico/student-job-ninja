@@ -27,17 +27,17 @@ import {
  */
 export interface Company {
     /**
+     * id
+     * @type {string}
+     * @memberof Company
+     */
+    id: string;
+    /**
      * address field
      * @type {Address}
      * @memberof Company
      */
     address: Address;
-    /**
-     * 
-     * @type {string}
-     * @memberof Company
-     */
-    id: string;
     /**
      * 
      * @type {string}
@@ -86,8 +86,8 @@ export function CompanyFromJSONTyped(json: any, ignoreDiscriminator: boolean): C
     }
     return {
         
-        'address': AddressFromJSON(json['address']),
         'id': json['_id'],
+        'address': AddressFromJSON(json['address']),
         'email': json['email'],
         'name': json['name'],
         'companyInfo': json['company_info'],
@@ -106,8 +106,8 @@ export function CompanyToJSON(value?: Company | null): any {
     }
     return {
         
-        'address': AddressToJSON(value.address),
         '_id': value.id,
+        'address': AddressToJSON(value.address),
         'email': value.email,
         'name': value.name,
         'company_info': value.companyInfo,

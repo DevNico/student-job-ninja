@@ -20,7 +20,7 @@ import { exists, mapValues } from '../runtime';
  */
 export interface Job {
     /**
-     * 
+     * id
      * @type {string}
      * @memberof Job
      */
