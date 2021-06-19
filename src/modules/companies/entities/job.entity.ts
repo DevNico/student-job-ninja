@@ -5,10 +5,10 @@ export class Job extends Entity {
   publisher_id: string;
   contactMail: string;
   jobName: string;
+  headerImageUrl = '';
   jobDescription: string;
   jobQualifications: string[];
   skills: string[];
-  //TODO: enum
   workArea: string;
   workBasis: number;
   languages: string[];

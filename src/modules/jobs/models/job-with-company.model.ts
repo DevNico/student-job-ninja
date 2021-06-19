@@ -19,6 +19,7 @@ export class JobWithCompany implements Job {
   final_accepted_id: string;
   publisher: Company;
   active: boolean;
+  headerImageUrl: string;
 
   constructor(partialJob: Partial<Job>, company: Company) {
     Object.assign(this, partialJob);

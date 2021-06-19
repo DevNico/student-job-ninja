@@ -71,6 +71,7 @@ export class CompaniesController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiResponse({ status: 400, description: 'company has active jobs' })
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Company)
@@ -182,13 +183,6 @@ export class CompaniesController {
   }
 
   ////////////////////tests
-
-  @Post('testmail')
-  sendTestMail(): void {
-    this.companiesService.sendTestMail().catch((err) => {
-      throw err;
-    });
-  }
 
   @ApiBearerAuth('access-token')
   @Post('jobtest')
