@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -91,7 +93,10 @@ export class CompaniesService {
       })
       .toArray();
     if (activeJobs.length > 0 || unfinishedJobs.length > 0)
-      throw new BadRequestException();
+      throw new HttpException(
+        'Not possible. Company has currently active or unfinished jobs.',
+        HttpStatus.CONFLICT,
+      );
     //delete completed jobs
     await this.mongodb
       .collection(Collections.jobs)

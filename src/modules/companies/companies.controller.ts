@@ -71,7 +71,10 @@ export class CompaniesController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
-  @ApiResponse({ status: 400, description: 'company has active jobs' })
+  @ApiResponse({
+    status: 409,
+    description: 'Not possible. Company has active or unfinished jobs.',
+  })
   @ApiBearerAuth('access-token')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.Company)

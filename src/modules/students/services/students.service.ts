@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   CACHE_MANAGER,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -69,6 +71,13 @@ export class StudentsService {
     return result;
   }
 
+  /**
+   * Delete own Student profile
+   *
+   * @param {AuthUser} user Firebase Auth user
+   * @return {*}  {Promise<void>}
+   * @memberof StudentsService
+   */
   async delete(user: AuthUser): Promise<void> {
     const today = new Date(Date.now());
     //check for unfinished but accepted jobs -> reject
@@ -76,7 +85,11 @@ export class StudentsService {
       .collection(Collections.jobs)
       .find({ final_accepted_id: user.uid, to: { $gte: today } })
       .toArray();
-    if (unfinishedJobs.length > 0) throw new BadRequestException();
+    if (unfinishedJobs.length > 0)
+      throw new HttpException(
+        'Not possible. Student has unfinished jobs.',
+        HttpStatus.CONFLICT,
+      );
 
     //delete profile by id
     await this.sharedDataAccessService
