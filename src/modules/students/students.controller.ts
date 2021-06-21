@@ -29,6 +29,10 @@ import { JobWithCompany } from '../jobs/models/job-with-company.model';
 import { StudentDto } from './dtos/create-student.dto';
 import { UpdateStudentDto } from './dtos/update-student.dto';
 import { Student } from './entities/student.entity';
+import {
+  savedJobsActions,
+  ToggleSavedJobsResponse,
+} from './models/toggle-saved-jobs-response.model';
 import { StudentsService } from './services/students.service';
 
 @Controller('students')
@@ -112,6 +116,62 @@ export class StudentsController {
     return this.studentsService.delete(req.user);
   }
 
+  //#################### Save jobs################
+  @ApiTags('students')
+  @ApiOperation({ summary: 'get own saved (Bookmarked) jobs' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'list of own saved jobs with company',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Student)
+  @Get('/saved')
+  getSavedJobs(@Req() req: Express.Request): Promise<JobWithCompany[]> {
+    const savedJobs = this.studentsService.getSavedJobs(req.user);
+    return savedJobs;
+  }
+
+  @ApiTags('students')
+  @ApiOperation({ summary: 'toggle saved (Bookmarked) jobs (add/delete)' })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'Action success',
+    type: ToggleSavedJobsResponse,
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.Student)
+  @Post('/saved/:jobId')
+  async toggleSavedJobs(
+    @Req() req: Express.Request,
+    @Param('jobId') jobId: string,
+  ): Promise<ToggleSavedJobsResponse> {
+    const deleteJobSuccess = await this.studentsService.deleteSavedJob(
+      req.user,
+      jobId,
+    );
+    if (deleteJobSuccess)
+      return <ToggleSavedJobsResponse>{
+        action: savedJobsActions.deleted,
+        ok: deleteJobSuccess,
+      };
+    return this.studentsService
+      .addSavedJob(req.user, jobId)
+      .then((addJobSuccess) => {
+        return <ToggleSavedJobsResponse>{
+          action: savedJobsActions.added,
+          ok: addJobSuccess,
+        };
+      });
+  }
+
+  //#################### Job Actions #############
   @ApiTags('students')
   @ApiOperation({ summary: 'get all requested jobs' })
   @ApiBearerAuth()

@@ -39,7 +39,7 @@ export class StudentDto {
   description: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   githubUrl: string;
 
   @IsInt()

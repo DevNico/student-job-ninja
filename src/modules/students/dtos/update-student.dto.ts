@@ -52,7 +52,7 @@ export class UpdateStudentDto {
   university: University;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   githubUrl: string;
 
   @IsNotEmpty()

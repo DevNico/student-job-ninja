@@ -13,6 +13,7 @@ import { Cache } from 'cache-manager';
 import { Db } from 'mongodb';
 import { AuthUser } from 'src/common/auth/auth-user.model';
 import { Collections } from 'src/common/enums/colletions.enum';
+import { Job } from 'src/modules/companies/entities/job.entity';
 import { JobWithCompany } from 'src/modules/jobs/models/job-with-company.model';
 import { SharedDataAccessService } from 'src/shared-data-access.service';
 import { MailService } from '../../mail/mail.service';
@@ -96,6 +97,81 @@ export class StudentsService {
       .deleteProfile(user, Collections.Students)
       .catch((err) => {
         throw err;
+      });
+  }
+
+  async getSavedJobs(user: AuthUser): Promise<JobWithCompany[]> {
+    //get saved job ids from student entity
+    const savedJobIds = await this.mongodb
+      .collection<Student>(Collections.Students)
+      .findOne({ _id: user.uid })
+      .then((result) => result.jobsMarkedIds);
+    if (!savedJobIds || savedJobIds.length === 0) return [];
+    return this.mongodb
+      .collection(Collections.jobs)
+      .aggregate(
+        [
+          //match _id in savedIds
+          {
+            $match: {
+              _id: { $in: savedJobIds },
+            },
+          },
+          //Join companies collection on _id
+          {
+            $lookup: {
+              from: 'companies',
+              localField: 'publisher_id',
+              foreignField: '_id',
+              as: 'publisher',
+            },
+          },
+          //add publisher to result
+          {
+            $addFields: {
+              publisher: {
+                $arrayElemAt: ['$publisher', 0],
+              },
+            },
+          },
+        ],
+        { allowDiskUse: true },
+      )
+      .toArray();
+  }
+
+  async deleteSavedJob(user: AuthUser, jobId: string): Promise<boolean> {
+    return this.mongodb
+      .collection<Student>(Collections.Students)
+      .updateOne(
+        { _id: user.uid },
+        { $pull: { jobsMarkedIds: { $in: [jobId] } } },
+      )
+      .then((result) => result.modifiedCount > 0)
+      .catch((err) => {
+        this.logger.log(err);
+        throw new InternalServerErrorException();
+      });
+  }
+
+  async addSavedJob(user: AuthUser, jobId: string): Promise<boolean> {
+    return this.mongodb
+      .collection<Student>(Collections.Students)
+      .updateOne(
+        { _id: user.uid },
+        {
+          $push: {
+            jobsMarkedIds: {
+              $each: [jobId],
+              $position: 0,
+            },
+          },
+        },
+      )
+      .then((result) => result.modifiedCount > 0)
+      .catch((err) => {
+        this.logger.log(err);
+        throw new InternalServerErrorException();
       });
   }
 
