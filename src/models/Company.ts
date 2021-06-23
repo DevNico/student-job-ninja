@@ -59,13 +59,13 @@ export interface Company {
 	homepage: string;
 	/**
 	 *
-	 * @type {string}
+	 * @type {object}
 	 * @memberof Company
 	 */
 	companyProfileImageUrl: string;
 	/**
 	 *
-	 * @type {string}
+	 * @type {object}
 	 * @memberof Company
 	 */
 	companyHeaderImageUrl: string;

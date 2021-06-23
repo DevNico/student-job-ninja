@@ -45,7 +45,7 @@ export interface Job {
 	jobName: string;
 	/**
 	 *
-	 * @type {string}
+	 * @type {object}
 	 * @memberof Job
 	 */
 	headerImageUrl: string;
@@ -120,7 +120,7 @@ export interface Job {
 	 * @type {object}
 	 * @memberof Job
 	 */
-	finalAcceptedId: object;
+	finalAcceptedId: string[];
 }
 
 export function JobFromJSON(json: any): Job {

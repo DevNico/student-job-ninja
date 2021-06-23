@@ -18,6 +18,9 @@ import {
     Student,
     StudentFromJSON,
     StudentToJSON,
+    ToggleSavedJobsResponse,
+    ToggleSavedJobsResponseFromJSON,
+    ToggleSavedJobsResponseToJSON,
     UpdateStudentDto,
     UpdateStudentDtoFromJSON,
     UpdateStudentDtoToJSON,
@@ -28,6 +31,10 @@ export interface StudentsControllerAcceptJobRequest {
 }
 
 export interface StudentsControllerRequestJobRequest {
+    jobId: string;
+}
+
+export interface StudentsControllerToggleSavedJobsRequest {
     jobId: string;
 }
 
@@ -144,6 +151,39 @@ export class StudentsApi extends runtime.BaseAPI {
     }
 
     /**
+     * get own saved (Bookmarked) jobs
+     */
+    async studentsControllerGetSavedJobsRaw(): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("access-token", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/students/saved`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * get own saved (Bookmarked) jobs
+     */
+    async studentsControllerGetSavedJobs(): Promise<void> {
+        await this.studentsControllerGetSavedJobsRaw();
+    }
+
+    /**
      * request job
      */
     async studentsControllerRequestJobRaw(requestParameters: StudentsControllerRequestJobRequest): Promise<runtime.ApiResponse<void>> {
@@ -178,6 +218,44 @@ export class StudentsApi extends runtime.BaseAPI {
      */
     async studentsControllerRequestJob(requestParameters: StudentsControllerRequestJobRequest): Promise<void> {
         await this.studentsControllerRequestJobRaw(requestParameters);
+    }
+
+    /**
+     * toggle saved (Bookmarked) jobs (add/delete)
+     */
+    async studentsControllerToggleSavedJobsRaw(requestParameters: StudentsControllerToggleSavedJobsRequest): Promise<runtime.ApiResponse<ToggleSavedJobsResponse>> {
+        if (requestParameters.jobId === null || requestParameters.jobId === undefined) {
+            throw new runtime.RequiredError('jobId','Required parameter requestParameters.jobId was null or undefined when calling studentsControllerToggleSavedJobs.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("access-token", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/students/saved/{jobId}`.replace(`{${"jobId"}}`, encodeURIComponent(String(requestParameters.jobId))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ToggleSavedJobsResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * toggle saved (Bookmarked) jobs (add/delete)
+     */
+    async studentsControllerToggleSavedJobs(requestParameters: StudentsControllerToggleSavedJobsRequest): Promise<ToggleSavedJobsResponse> {
+        const response = await this.studentsControllerToggleSavedJobsRaw(requestParameters);
+        return await response.value();
     }
 
     /**

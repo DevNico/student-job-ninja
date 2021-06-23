@@ -19,6 +19,7 @@ src/models/JobWithCompany.ts
 src/models/SearchJobDto.ts
 src/models/Student.ts
 src/models/StudentDto.ts
+src/models/ToggleSavedJobsResponse.ts
 src/models/University.ts
 src/models/UpdateStudentDto.ts
 src/models/UserResponse.ts

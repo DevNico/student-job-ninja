@@ -7,6 +7,7 @@ export * from './JobWithCompany';
 export * from './SearchJobDto';
 export * from './Student';
 export * from './StudentDto';
+export * from './ToggleSavedJobsResponse';
 export * from './University';
 export * from './UpdateStudentDto';
 export * from './UserResponse';
