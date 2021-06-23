@@ -42,8 +42,7 @@ export class CreateJobDto {
   @IsString()
   workArea: string;
 
-  @IsInt() //full-time: 1 //half-time: 2
-  @Min(1)
+  @IsInt() //full-time: 1 //half-time: 2 //empty: 0
   @Max(2)
   workBasis: number;
 

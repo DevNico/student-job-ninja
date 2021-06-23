@@ -100,7 +100,7 @@ export class JobProcessor {
 
     const matches = await this.findMatchedStudents(
       job.data,
-      minSkillsRequired,
+      minSkillsRequired, //optional: replace with job.data.skills.length
       matchingLimit,
     );
     if (matches.length > 0) {

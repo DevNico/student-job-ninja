@@ -94,11 +94,12 @@ export class StudentDto {
   @IsDate()
   toAvailable: Date;
 
-  @IsInt() //full-time: 1 //half-time: 2
-  @Min(1)
+  @IsNotEmpty()
+  @IsInt() //full-time: 1 //half-time: 2 //empty: 0
   @Max(2)
   workBasis: number;
 
+  @IsNotEmpty()
   @IsString()
   workArea: string;
 }
