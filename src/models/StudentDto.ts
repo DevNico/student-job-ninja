@@ -77,16 +77,16 @@ export interface StudentDto {
 	semester: number;
 	/**
 	 *
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof StudentDto
 	 */
-	skills: Array<string>;
+	skills: string[];
 	/**
 	 *
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof StudentDto
 	 */
-	languages: Array<string>;
+	languages: string[];
 	/**
 	 *
 	 * @type {Date}

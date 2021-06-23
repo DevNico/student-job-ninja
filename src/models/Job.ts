@@ -57,16 +57,16 @@ export interface Job {
 	jobDescription: string;
 	/**
 	 *
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof Job
 	 */
-	jobQualifications: Array<string>;
+	jobQualifications: string[];
 	/**
 	 *
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof Job
 	 */
-	skills: Array<string>;
+	skills: string[];
 	/**
 	 *
 	 * @type {string}
@@ -81,10 +81,10 @@ export interface Job {
 	workBasis: number;
 	/**
 	 *
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof Job
 	 */
-	languages: Array<string>;
+	languages: string[];
 	/**
 	 *
 	 * @type {Date}
@@ -105,19 +105,19 @@ export interface Job {
 	active: boolean;
 	/**
 	 *
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof Job
 	 */
-	requestedByStudents: Array<string>;
+	requestedByStudents: string[];
 	/**
 	 *
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof Job
 	 */
-	requestedIds: Array<string>;
+	requestedIds: string[];
 	/**
 	 *
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof Job
 	 */
 	finalAcceptedId: string[];

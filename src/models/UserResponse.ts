@@ -35,10 +35,10 @@ export interface UserResponse {
 	userData: Student | Company;
 	/**
 	 * Jobs with company or only jobs (userType Company)
-	 * @type {Array<string>}
+	 * @type {string[]}
 	 * @memberof UserResponse
 	 */
-	assignedJobs: Array<string>;
+	assignedJobs: string[];
 }
 
 export function UserResponseFromJSON(json: any): UserResponse {
