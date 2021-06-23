@@ -65,7 +65,7 @@ export interface StudentDto {
 	githubUrl: string;
 	/**
 	 *
-	 * @type {object}
+	 * @type {string}
 	 * @memberof StudentDto
 	 */
 	yearsOfExperience: number;

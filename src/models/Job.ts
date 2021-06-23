@@ -45,7 +45,7 @@ export interface Job {
 	jobName: string;
 	/**
 	 *
-	 * @type {object}
+	 * @type {string}
 	 * @memberof Job
 	 */
 	headerImageUrl: string;
@@ -117,7 +117,7 @@ export interface Job {
 	requestedIds: Array<string>;
 	/**
 	 *
-	 * @type {object}
+	 * @type {Array<string>}
 	 * @memberof Job
 	 */
 	finalAcceptedId: string[];
