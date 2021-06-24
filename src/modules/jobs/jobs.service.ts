@@ -146,9 +146,6 @@ export class JobsService {
           from: {
             $gte: new Date(searchDto.from),
           },
-          to: {
-            $gte: new Date(searchDto.to),
-          },
         },
       });
     }
@@ -156,7 +153,7 @@ export class JobsService {
       aggMatchQuery.push({
         $match: {
           to: {
-            $gte: new Date(searchDto.to),
+            $lte: new Date(searchDto.to),
           },
         },
       });
