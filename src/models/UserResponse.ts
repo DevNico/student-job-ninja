@@ -37,7 +37,7 @@ export interface UserResponse {
 	userData: Student | Company;
 	/**
 	 * Jobs with company or only jobs (userType Company)
-	 * @type {Array<string>}
+	 * @type {Job[] | JobWithCompany[]}
 	 * @memberof UserResponse
 	 */
 	assignedJobs: Job[] | JobWithCompany[];
@@ -71,8 +71,9 @@ export function UserResponseToJSON(value?: UserResponse | null): any {
 	return {
 		userType: value.userType,
 		userData: value.userType === 'student' ? StudentToJSON(value.userData as Student) : CompanyToJSON(value.userData as Company),
-		assignedJobs: value.assignedJobs.map((j: Job | JobWithCompany) =>
-			value.userType === 'student' ? JobWithCompanyToJSON(j as JobWithCompany) : JobToJSON(j as Job)
-		),
+		assignedJobs:
+			value.userType === 'student'
+				? (value.assignedJobs as JobWithCompany[]).map((j) => JobWithCompanyToJSON(j))
+				: (value.assignedJobs as Job[]).map((j) => JobToJSON(j)),
 	};
 }
