@@ -55,6 +55,14 @@ export class UpdateStudentDto {
   @IsString()
   githubUrl: string;
 
+  @IsOptional()
+  @IsString()
+  profileImageUrl: string;
+
+  @IsOptional()
+  @IsString()
+  headerImageUrl: string;
+
   @IsNotEmpty()
   @IsInt()
   @Min(1)

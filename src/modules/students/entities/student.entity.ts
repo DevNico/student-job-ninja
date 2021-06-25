@@ -11,6 +11,8 @@ export class Student extends Entity {
   //equal to firebase -> firebase.entities
   identities?: any[];
   githubUrl: string;
+  profileImageUrl: string;
+  headerImageUrl: string;
   firstName: string;
   lastName: string;
   description?: string;

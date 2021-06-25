@@ -185,18 +185,23 @@ export class JobProcessor {
       .aggregate(
         [
           //Stage 1:
-          //Match only students with equal workBasis and workArea
+          //Match only students with equal workBasis
           //and correct language
           {
             $match: {
-              workBasis: job.workBasis, //e.g. 1
-              workArea: job.workArea, //e.g. fullstack
+              $or: [{ workBasis: job.workBasis }, { workBasis: 0 }], //e.g. 1
               $expr: {
                 $setIsSubset: [
                   job.languages, //e.g. ['german', 'english']
                   '$languages',
                 ],
               },
+            },
+          },
+          //Stage 1.1: match work area (workaround -> multiple $or's not allowed)
+          {
+            $match: {
+              $or: [{ workArea: job.workArea }, { workArea: 'none' }], //e.g. fullstack
             },
           },
           //Stage 2:
