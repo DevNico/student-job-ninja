@@ -13,7 +13,9 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import { Company, CompanyFromJSON, CompanyFromJSONTyped, CompanyToJSON, Student, StudentFromJSON, StudentFromJSONTyped, StudentToJSON } from './';
+import { Company, CompanyFromJSON, CompanyFromJSONTyped, CompanyToJSON, Job, Student, StudentFromJSON, StudentFromJSONTyped, StudentToJSON } from './';
+import { JobFromJSON, JobToJSON } from './Job';
+import { JobWithCompany, JobWithCompanyFromJSON, JobWithCompanyToJSON } from './JobWithCompany';
 
 /**
  *
@@ -35,10 +37,10 @@ export interface UserResponse {
 	userData: Student | Company;
 	/**
 	 * Jobs with company or only jobs (userType Company)
-	 * @type {string[]}
+	 * @type {Array<string>}
 	 * @memberof UserResponse
 	 */
-	assignedJobs: string[];
+	assignedJobs: Job[] | JobWithCompany[];
 }
 
 export function UserResponseFromJSON(json: any): UserResponse {
@@ -52,7 +54,10 @@ export function UserResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
 	return {
 		userType: json['userType'],
 		userData: json['userType'] === 'student' ? StudentFromJSON(json['userData']) : CompanyFromJSON(json['userData']),
-		assignedJobs: json['assignedJobs'],
+		assignedJobs:
+			json['userType'] === 'student'
+				? (json['assignedJobs'] as any[]).map((j) => JobWithCompanyFromJSON(j))
+				: (json['assignedJobs'] as any[]).map((j) => JobFromJSON(j)),
 	};
 }
 
@@ -66,6 +71,8 @@ export function UserResponseToJSON(value?: UserResponse | null): any {
 	return {
 		userType: value.userType,
 		userData: value.userType === 'student' ? StudentToJSON(value.userData as Student) : CompanyToJSON(value.userData as Company),
-		assignedJobs: value.assignedJobs,
+		assignedJobs: value.assignedJobs.map((j: Job | JobWithCompany) =>
+			value.userType === 'student' ? JobWithCompanyToJSON(j as JobWithCompany) : JobToJSON(j as Job)
+		),
 	};
 }

@@ -68,6 +68,18 @@ export interface StudentDto {
 	 * @type {string}
 	 * @memberof StudentDto
 	 */
+	profileImageUrl: string;
+	/**
+	 *
+	 * @type {string}
+	 * @memberof StudentDto
+	 */
+	headerImageUrl: string;
+	/**
+	 *
+	 * @type {number}
+	 * @memberof StudentDto
+	 */
 	yearsOfExperience: number;
 	/**
 	 *
@@ -77,16 +89,16 @@ export interface StudentDto {
 	semester: number;
 	/**
 	 *
-	 * @type {string[]}
+	 * @type {Array<string>}
 	 * @memberof StudentDto
 	 */
-	skills: string[];
+	skills: Array<string>;
 	/**
 	 *
-	 * @type {string[]}
+	 * @type {Array<string>}
 	 * @memberof StudentDto
 	 */
-	languages: string[];
+	languages: Array<string>;
 	/**
 	 *
 	 * @type {Date}
@@ -129,6 +141,8 @@ export function StudentDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
 		lastName: json['lastName'],
 		description: json['description'],
 		githubUrl: json['githubUrl'],
+		profileImageUrl: json['profileImageUrl'],
+		headerImageUrl: json['headerImageUrl'],
 		yearsOfExperience: json['yearsOfExperience'],
 		semester: json['semester'],
 		skills: json['skills'],
@@ -155,6 +169,8 @@ export function StudentDtoToJSON(value?: StudentDto | null): any {
 		lastName: value.lastName,
 		description: value.description,
 		githubUrl: value.githubUrl,
+		profileImageUrl: value.profileImageUrl,
+		headerImageUrl: value.headerImageUrl,
 		yearsOfExperience: value.yearsOfExperience,
 		semester: value.semester,
 		skills: value.skills,

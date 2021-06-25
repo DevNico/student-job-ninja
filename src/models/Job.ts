@@ -57,16 +57,16 @@ export interface Job {
 	jobDescription: string;
 	/**
 	 *
-	 * @type {string[]}
+	 * @type {Array<string>}
 	 * @memberof Job
 	 */
-	jobQualifications: string[];
+	jobQualifications: Array<string>;
 	/**
 	 *
-	 * @type {string[]}
+	 * @type {Array<string>}
 	 * @memberof Job
 	 */
-	skills: string[];
+	skills: Array<string>;
 	/**
 	 *
 	 * @type {string}
@@ -81,10 +81,10 @@ export interface Job {
 	workBasis: number;
 	/**
 	 *
-	 * @type {string[]}
+	 * @type {Array<string>}
 	 * @memberof Job
 	 */
-	languages: string[];
+	languages: Array<string>;
 	/**
 	 *
 	 * @type {Date}
@@ -105,22 +105,22 @@ export interface Job {
 	active: boolean;
 	/**
 	 *
-	 * @type {string[]}
+	 * @type {Array<string>}
 	 * @memberof Job
 	 */
-	requestedByStudents: string[];
+	requestedByStudents: Array<string>;
 	/**
 	 *
-	 * @type {string[]}
+	 * @type {Array<string>}
 	 * @memberof Job
 	 */
-	requestedIds: string[];
+	requestedIds: Array<string>;
 	/**
 	 *
-	 * @type {string[]}
+	 * @type {string}
 	 * @memberof Job
 	 */
-	finalAcceptedId: string[];
+	finalAcceptedId: string;
 }
 
 export function JobFromJSON(json: any): Job {
