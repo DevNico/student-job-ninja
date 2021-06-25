@@ -12,7 +12,7 @@ export class UserResponse {
   userType: string; //typeof userData
 
   @ApiProperty({
-    description: 'Student entity',
+    description: 'Student or Company entity',
     oneOf: [{ $ref: getSchemaPath(Student) }, { $ref: getSchemaPath(Company) }],
   })
   userData: Student | Company;
