@@ -15,6 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
+    JobWithCompany,
+    JobWithCompanyFromJSON,
+    JobWithCompanyToJSON,
     Student,
     StudentFromJSON,
     StudentToJSON,
@@ -153,7 +156,7 @@ export class StudentsApi extends runtime.BaseAPI {
     /**
      * get own saved (Bookmarked) jobs
      */
-    async studentsControllerGetSavedJobsRaw(): Promise<runtime.ApiResponse<void>> {
+    async studentsControllerGetSavedJobsRaw(): Promise<runtime.ApiResponse<Array<JobWithCompany>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -173,14 +176,15 @@ export class StudentsApi extends runtime.BaseAPI {
             query: queryParameters,
         });
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(JobWithCompanyFromJSON));
     }
 
     /**
      * get own saved (Bookmarked) jobs
      */
-    async studentsControllerGetSavedJobs(): Promise<void> {
-        await this.studentsControllerGetSavedJobsRaw();
+    async studentsControllerGetSavedJobs(): Promise<Array<JobWithCompany>> {
+        const response = await this.studentsControllerGetSavedJobsRaw();
+        return await response.value();
     }
 
     /**
