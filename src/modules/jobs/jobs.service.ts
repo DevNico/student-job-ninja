@@ -128,20 +128,32 @@ export class JobsService {
     if (searchDto.languages && searchDto.languages.length > 0) {
       aggMatchQuery.push({
         $match: {
-          $expr: {
-            $setIsSubset: [searchDto.languages, '$languages'],
+          languages: {
+            $in: searchDto.languages,
           },
         },
       });
     }
     if (searchDto.skills && searchDto.skills.length > 0) {
-      aggMatchQuery.push({
+      aggMatchQuery.push(
+        // Direct match: Return only jobs containing all skills
+        /*{
         $match: {
           $expr: {
             $setIsSubset: [searchDto.skills, '$skills'],
           },
         },
-      });
+      }
+      */
+        //match all jobs containing min. one of the filtered skills
+        {
+          $match: {
+            skills: {
+              $in: searchDto.skills,
+            },
+          },
+        },
+      );
     }
 
     if (searchDto.from) {
