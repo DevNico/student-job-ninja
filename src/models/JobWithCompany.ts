@@ -134,6 +134,12 @@ export interface JobWithCompany {
      * @memberof JobWithCompany
      */
     headerImageUrl: string;
+    /**
+     * 
+     * @type {Date}
+     * @memberof JobWithCompany
+     */
+    createdAt: Date;
 }
 
 export function JobWithCompanyFromJSON(json: any): JobWithCompany {
@@ -164,6 +170,7 @@ export function JobWithCompanyFromJSONTyped(json: any, ignoreDiscriminator: bool
         'publisher': CompanyFromJSON(json['publisher']),
         'active': json['active'],
         'headerImageUrl': json['headerImageUrl'],
+        'createdAt': (new Date(json['createdAt'])),
     };
 }
 
@@ -194,6 +201,7 @@ export function JobWithCompanyToJSON(value?: JobWithCompany | null): any {
         'publisher': CompanyToJSON(value.publisher),
         'active': value.active,
         'headerImageUrl': value.headerImageUrl,
+        'createdAt': (value.createdAt.toISOString()),
     };
 }
 

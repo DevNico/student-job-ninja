@@ -99,6 +99,12 @@ export interface Job {
 	to: Date;
 	/**
 	 *
+	 * @type {Date}
+	 * @memberof Job
+	 */
+	createdAt: Date;
+	/**
+	 *
 	 * @type {boolean}
 	 * @memberof Job
 	 */
@@ -145,6 +151,7 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
 		languages: json['languages'],
 		from: new Date(json['from']),
 		to: new Date(json['to']),
+		createdAt: new Date(json['createdAt']),
 		active: json['active'],
 		requestedByStudents: json['requested_by_students'],
 		requestedIds: json['requested_ids'],
@@ -173,6 +180,7 @@ export function JobToJSON(value?: Job | null): any {
 		languages: value.languages,
 		from: value.from.toISOString(),
 		to: value.to.toISOString(),
+		createdAt: value.createdAt.toISOString(),
 		active: value.active,
 		requested_by_students: value.requestedByStudents,
 		requested_ids: value.requestedIds,
