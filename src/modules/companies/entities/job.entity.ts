@@ -14,6 +14,7 @@ export class Job extends Entity {
   languages: string[];
   from: Date;
   to: Date;
+  createdAt: Date;
   active: boolean;
   requested_by_students: string[];
   requested_ids: string[];
@@ -22,5 +23,6 @@ export class Job extends Entity {
   constructor(id, partial: Partial<Job>) {
     super(id);
     Object.assign(this, partial);
+    this.createdAt = new Date(Date.now());
   }
 }

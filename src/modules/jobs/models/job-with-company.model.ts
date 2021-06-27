@@ -39,6 +39,8 @@ export class JobWithCompany implements Job {
   active: boolean;
   @ApiProperty()
   headerImageUrl: string;
+  @ApiProperty()
+  createdAt: Date;
 
   constructor(partialJob: Partial<Job>, company: Company) {
     Object.assign(this, partialJob);
