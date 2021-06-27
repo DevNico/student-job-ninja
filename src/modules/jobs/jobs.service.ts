@@ -107,7 +107,11 @@ export class JobsService {
         $match: { $text: { $search: searchDto.searchString }, active: true },
       });
     }
-    if (searchDto.workArea && searchDto.workArea.length > 0) {
+    if (
+      searchDto.workArea &&
+      searchDto.workArea.length > 0 &&
+      searchDto.workArea != 'none'
+    ) {
       aggMatchQuery.push({
         $match: {
           workArea: searchDto.workArea,

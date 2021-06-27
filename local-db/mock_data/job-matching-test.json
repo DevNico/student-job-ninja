@@ -1,0 +1,12 @@
+{
+  "contactMail": "string@test.de",
+  "jobName": "MatchTest1",
+  "jobDescription": "test",
+  "jobQualifications": ["string"],
+  "skills": ["java", "python"],
+  "workArea": "fullstack",
+  "workBasis": 1,
+  "languages": ["german"],
+  "from": "2020-05-17T15:21:57.964Z",
+  "to": "2020-08-17T15:21:57.964Z"
+}

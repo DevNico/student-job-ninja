@@ -6,8 +6,11 @@ import { AppModule } from './app.module';
 import { writeFileSync } from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: true,
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.enableCors({
+    origin: true,
+    preflightContinue: true,
+    methods: ['GET', 'PUT', 'POST', 'DELETE'],
   });
 
   app.use(function (req, res, next) {
