@@ -122,6 +122,7 @@ export class StudentsController {
   @ApiBearerAuth()
   @ApiOkResponse({
     description: 'list of own saved jobs with company',
+    type: [JobWithCompany],
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal MongoDB error.' })
