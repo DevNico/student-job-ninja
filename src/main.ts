@@ -17,7 +17,6 @@ async function bootstrap() {
     res.header('x-powered-by', '');
     next();
   });
-
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const config = new DocumentBuilder()

@@ -3,4 +3,5 @@ export enum Collections {
   Companies = 'companies',
   Registry = 'registry',
   jobs = 'jobs',
+  mails = 'mails',
 }

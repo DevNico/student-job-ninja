@@ -184,7 +184,7 @@ export class StudentsService {
    * @memberof StudentsService
    */
   async acceptJob(user: AuthUser, jobId: string): Promise<boolean> {
-    //TODO: send contact mail
+    //Future Step: send contact mail
     return this.mongodb
       .collection(Collections.jobs)
       .updateOne(
@@ -209,7 +209,6 @@ export class StudentsService {
    * @memberof StudentsService
    */
   async requestJob(user: AuthUser, jobId: string): Promise<boolean> {
-    //TODO: send new request mail to company
     return this.mongodb
       .collection(Collections.jobs)
       .updateOne(

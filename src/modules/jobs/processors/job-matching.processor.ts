@@ -154,17 +154,15 @@ export class JobProcessor {
     student: StudentMatch,
     company: Company,
   ): Promise<InsertOneWriteOpResult<MailEntity>> {
-    //TODO: REMOVE MOCK
-    return <InsertOneWriteOpResult<MailEntity>>{ insertedCount: 1 };
     const result = await this.mailService.sendJobOffer(
       <JobRequestMailData>{
         to: student.email,
         companyName: company.name,
-        url: 'http://google.com', //TODO
+        url: `http://jobs.student.ninja/app/job-annehmen/${job._id}`,
         jobName: job.jobName,
         jobDescription: job.jobDescription,
-        fromDate: job.from.toDateString(),
-        toDate: job.to.toDateString(),
+        fromDate: job.from.toLocaleDateString(),
+        toDate: job.to.toLocaleDateString(),
       },
       new MailEntity({
         companyId: job.publisher_id,

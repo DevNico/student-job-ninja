@@ -234,11 +234,11 @@ export class CompaniesService {
         <JobRequestMailData>{
           to: student.email,
           studentName: `${student.firstName} ${student.lastName}`,
-          url: 'http://google.com', //TODO
+          url: `http://jobs.student.ninja/app/job-annehmen/${jobId}`,
           companyName: company.name,
           jobName: job.jobName,
-          fromDate: job.from.toDateString(),
-          toDate: job.to.toDateString(),
+          fromDate: job.from.toLocaleDateString(),
+          toDate: job.to.toLocaleDateString(),
           jobDescription: job.jobDescription,
         },
         new MailEntity({

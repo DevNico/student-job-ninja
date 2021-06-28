@@ -10,6 +10,7 @@ import { Db, InsertOneWriteOpResult } from 'mongodb';
 import { MailEntity } from './entities/mail.entity';
 import { join } from 'path';
 import * as fs from 'fs';
+import { Collections } from 'src/common/enums/colletions.enum';
 
 /**
  * Mailing service for sending Job request mails with handlebars template
@@ -50,6 +51,16 @@ export class MailService {
       this.logger.error('PATH not available: ', path);
       throw new InternalServerErrorException();
     }
+    const alreadySent = this.mongodb
+      .collection(Collections.mails)
+      .findOne({ _id: mailEntity._id })
+      .then((mail) => {
+        if (mail && mail._id) return true;
+        return false;
+      })
+      .catch(() => false);
+    if (alreadySent)
+      return <InsertOneWriteOpResult<MailEntity>>{ insertedCount: 0 };
     return this.mailerService
       .sendMail({
         to: mailData.to,
@@ -71,7 +82,7 @@ export class MailService {
       })
       .then(async () => {
         return this.mongodb
-          .collection('mails')
+          .collection(Collections.mails)
           .insertOne(mailEntity)
           .catch((err) => {
             this.logger.error(err);

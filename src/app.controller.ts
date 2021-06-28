@@ -115,7 +115,6 @@ export class AppController {
         throw err;
       });
 
-    //TODO refactor #5
     if (roles && roles.includes(Role.Student)) {
       const profile = await this.sharedDataAccessService.getUserById<Student>(
         uid,
