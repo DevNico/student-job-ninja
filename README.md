@@ -8,128 +8,100 @@ $ npm install
 
 ## Running the app with local mongoDB
 
-- Requirements: 
+- Requirements:
+
   1. working docker on local machine
   2. set custom configuration -> remove the .template ending of .env file (Root directory)
   3. Get firebase admin credentials json file from firebase console and save it to root directory as:  
-    ```/ss21-js-backend/firebase-admin-credentials.json```
+     `/ss21-js-backend/firebase-admin-credentials.json`
 
--  First Step: 
-    ```bash
-    #Start mongoDB with docker compose
-    $ npm run start:mongodb
+- First Step:
 
-    #After testing stop the container with
-    $ npm run stop:mongodb
-    ```
+  ```bash
+  #Start mongoDB with docker compose
+  $ npm run start:mongodb
 
+  #After testing stop the container with
+  $ npm run stop:mongodb
+  ```
 
 - Second step:
-    ```bash
-    # development
-    $ npm run start
 
-    # watch mode
-    $ npm run start:dev
+  ```bash
+  # development
+  $ npm run start
 
-    # production mode
-    $ npm run start:prod
-    ```
+  # watch mode
+  $ npm run start:dev
+
+  # production mode
+  $ npm run start:prod
+  ```
 
 ## Project structure
 
-### Directory:
-```bash
- ├── Dockerfile #For dockerizing the nest app
- ├── local-db/ # Contains a docker-compose -> runs a mongoDB service
- │  └──── docker-compose.yml
- ├── src/
- |  |   # Entrypoints equal for students and companies (e.g. login)
- │  ├── app.controller.ts 
- |  |   # Root Module contains imports of available modules
- │  ├── app.module.ts
- |  |   # Db operations equal for multiple entities
- │  ├── shared-data-access.service.ts    
- │  └── common/ #MODULES /SERVIES used in multiple modules 
- │  │  └──── auth/ # Firebase auth guard and strategy for jwt encoding
- │  │  └──── mailer/ #TODO mailing service
- │  └── config/ #Future: directiory for more complex configurations
- │  │  └──── enviroment.ts
- │  ├── main.ts # Starts the server
- │  └── modules/ # Grouped M/C/S sets
- │  │  └──── companies/
- │  │  │  ├──── companies.controller.ts # API endpoints (REST)
- │  │  │  ├──── companies.module.ts # binds C/S and additional module (DI)
- │  │  │  └──── companies.service.ts # backend logic (DB client)
- │  │  └──── students/
- │  │     ├──── students.controller.ts
- │  │     ├──── students.module.ts
- │  │     └──── students.service.ts
- │  └── providers/
- │     ├──── mongodb/
- │     |  └──── mongo.module.ts #Client module for mongoDB
- │     └──── firebase/
- │        └──── firebase-admin.module.ts #Global firebase app initialisation
- │
- ├── tsconfig.build.json
- └── tsconfig.json
-```
+- Main Modules:
 
-## Hosting structure
-- ``coming soon``
+  - Student Module -> handles Student specific actions (e.g. handle bookmarks)
+  - Company Module -> handles Company specific actions
+  - Job Module -> handles Job specific actions (e.g. search job) and Processors
+  - App Module -> handles global available endpoints (e.g. user/me)
 
-## endpoints ( SWAGGER AVAILABLE -> /api)
+- Shared Modules:
+  - MongoDb Module -> MongoDB connection and indexing
+  - Mailer Module -> Sending Mails
+  - Caching Module -> Redis Cache initialization and connection
 
-- GET /user/me: returns the currently logged in user
-- POST /students/signup: signup endpoint for a new student
-- POST /companies/signup: signup endpoint for a new company
+## Hosting structure (Production)
 
------
+- Traefik reverse Proxy with ssl configuration
+- Portainer for docker management (basic auth)
+- Docker-compose for the api and redis container
+- Docker-compose for MongoDb and MongoExpress(MongoDB GUI client, Basic auth)
+
+## Openapi
+
+- Swagger OpenAPI documentation
+
+- Available:
+  - localhost:3000/api/
+  - https://ss21.api.kse-dev.de/api/
+
+---
+
 ## Firebase Auth
+
 <center><img src="https://docs.nestjs.com/assets/Guards_1.png"></center>
 
 ### Authentification flow
+
 1. Requests for Endpoints secured by AuthGuard get checked for token in header
-    - ``-H 'Authorization: Bearer eyJhbG...``
-  (throws notAuthorized if N/a)
+   - `-H 'Authorization: Bearer eyJhbG...`
+     (throws notAuthorized if N/a)
 2. In case Token is available the validate Method of FirebaseAuthStrategy extracts it and tries to validate and decode token by using the firebase admin
 
-3. After validation the token payload will be chained to the Request object and is reachable with the user key ``req.user``
+3. After validation the token payload will be chained to the Request object and is reachable with the user key `req.user`
+
+4. If endpoint requires **RolesGuard**: Get roles From MongoDB and append to `req.user object`
 
 ## Mail Module
-- Technologies: 
+
+- Technologies:
   - @nest-modules/mailer for connecting to provider and send mails
   - Handlebars as template engine for replacing text and url in email
 
-### Configuration
-- Class with configuation: ``mail-config.service.ts`` (mailConfigService)
-- Initialise mailer in root ``app.module.ts``
-  ```typescript
-  MailerModule.forRootAsync({
-      useClass: MailConfigService,
-  }),
-  ```
-- Use MailModule in Students/companies service
-  ```typescript
-  //Import Module in student/company module
-  @Module({
-  imports: [MailModule],
-  })
+## Job Handling
 
-  //inject in service class via constructor
-  constructor(
-    private mailService: MailService,
-  ) {}
-  ```
-### Usage example
-```typescript
-await this.mailService.sendJobOffer({
-        to: email,
-        title: 'mail title',
-        url: 'accept offer url',
-        text1: 'template text1',
-        text2: 'template text2'
-    });
-```
+- Technologies:
 
+  - @nestjs/schedule for scheduling tasks
+  - @nestjs/bull queue for queue jobs with delay
 
+- Steps a job runs through:
+
+  1. After Create: Search for matching students
+  2. if no match found: Push Job to queue with delay of one day
+  3. Retry step 2 until Match found oder student requested job by himself
+
+- Job Date validation:
+  - Daily check if date of job is still valid with cron job
