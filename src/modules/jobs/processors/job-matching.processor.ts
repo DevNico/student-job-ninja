@@ -161,8 +161,8 @@ export class JobProcessor {
         url: `http://jobs.student.ninja/app/job-annehmen/${job._id}`,
         jobName: job.jobName,
         jobDescription: job.jobDescription,
-        fromDate: job.from.toLocaleDateString(),
-        toDate: job.to.toLocaleDateString(),
+        fromDate: job.from.toString(),
+        toDate: job.to.toString(),
       },
       new MailEntity({
         companyId: job.publisher_id,

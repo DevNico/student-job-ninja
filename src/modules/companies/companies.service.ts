@@ -237,8 +237,8 @@ export class CompaniesService {
           url: `http://jobs.student.ninja/app/job-annehmen/${jobId}`,
           companyName: company.name,
           jobName: job.jobName,
-          fromDate: job.from.toLocaleDateString(),
-          toDate: job.to.toLocaleDateString(),
+          fromDate: job.from.toString(),
+          toDate: job.to.toString(),
           jobDescription: job.jobDescription,
         },
         new MailEntity({
