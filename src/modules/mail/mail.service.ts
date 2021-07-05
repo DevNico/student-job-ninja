@@ -51,16 +51,20 @@ export class MailService {
       this.logger.error('PATH not available: ', path);
       throw new InternalServerErrorException();
     }
-    const alreadySent = this.mongodb
-      .collection(Collections.mails)
+    const alreadySent = await this.mongodb
+      .collection<MailEntity>(Collections.mails)
       .findOne({ _id: mailEntity._id })
       .then((mail) => {
-        if (mail && mail._id) return true;
+        if (mail && mail._id.length > 0) return true;
         return false;
       })
-      .catch(() => false);
+      .catch(() => {
+        return false;
+      });
+    this.logger.log(`Mail already sent to ${mailEntity._id}`);
     if (alreadySent)
       return <InsertOneWriteOpResult<MailEntity>>{ insertedCount: 0 };
+    this.logger.log('sending mail to ' + mailData.to);
     return this.mailerService
       .sendMail({
         to: mailData.to,
@@ -77,17 +81,11 @@ export class MailService {
           toDate: mailData.toDate,
         },
       })
+      .then(() =>
+        this.mongodb.collection(Collections.mails).insertOne(mailEntity),
+      )
       .catch((err) => {
         throw err;
-      })
-      .then(async () => {
-        return this.mongodb
-          .collection(Collections.mails)
-          .insertOne(mailEntity)
-          .catch((err) => {
-            this.logger.error(err);
-            throw new InternalServerErrorException();
-          });
       });
   }
 }
